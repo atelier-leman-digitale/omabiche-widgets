@@ -9,20 +9,17 @@
 
   body {
     font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
-    background: #fff5f7;
+    background: #fff;
     min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 24px 16px 48px;
+    padding: 0; margin: 0;
   }
 
   .ig-wrapper {
     width: 100%;
-    max-width: 480px;
+    max-width: 100%;
     background: #fff;
-    border: 0.5px solid #f5c8d4;
-    border-radius: 16px;
+    
+    border-radius: 0;
     overflow: hidden;
   }
 
@@ -81,23 +78,13 @@
   }
 
   /* ── TABS ── */
-  .ig-tabs { display: flex; border-bottom: 0.5px solid #fde8ee; }
-  .ig-tab {
-    flex: 1; text-align: center; padding: 10px;
-    font-size: 11px; color: #bbb; cursor: pointer;
-    border-bottom: 2px solid transparent;
-    border: none; background: none; font-family: inherit;
-    transition: all 0.2s;
-  }
-  .ig-tab.active { color: #e0607a; border-bottom: 2px solid #ffabbf; font-weight: 600; }
-  .ig-tab:hover:not(.active) { background: #fff5f7; color: #e0607a; }
-
   /* ── GRID ── */
   .ig-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 2px;
     background: #fde8ee;
+    width: 100%;
   }
 
   .ig-cell {
@@ -322,55 +309,13 @@
 
 <div class="ig-wrapper">
 
-  <!-- PROFILE -->
-  <div class="ig-profile">
-    <div class="ig-profile-top">
-      <div class="ig-avatar">ŌM</div>
-      <div style="flex:1">
-        <div class="ig-username">@o_mabiche</div>
-        <div class="ig-name">Ō Ma Biche · Institut PMU Lausanne</div>
-      </div>
-    </div>
-    <div class="ig-stats">
-      <div class="ig-stat"><span class="ig-stat-num">281</span><span class="ig-stat-label">posts</span></div>
-      <div class="ig-stat"><span class="ig-stat-num">1 749</span><span class="ig-stat-label">abonnés</span></div>
-      <div class="ig-stat"><span class="ig-stat-num">1 216</span><span class="ig-stat-label">abonnements</span></div>
-    </div>
-    <div class="ig-bio">
-      Maquillage semi-permanent discret &amp; naturel ✨<br>
-      Microshading · Lèvres · Rehaussement cils<br>
-      📍 Lausanne · 12 ans d'expertise PMU
-    </div>
-    <div class="ig-link">↓ Réservez ici</div>
-    <button class="ig-follow-btn">Suivre</button>
-  </div>
-
-  <!-- TABS -->
-  <div class="ig-tabs">
-    <button class="ig-tab active" onclick="switchTab('grid', this)">Grille</button>
-    <button class="ig-tab" onclick="switchTab('map', this)">Piliers</button>
-  </div>
 
   <!-- GRID VIEW -->
   <div id="gridView">
     <div class="ig-grid" id="igGrid"></div>
-    <button class="add-post-btn" onclick="openAddModal()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Ajouter un post
-    </button>
-    <div class="legend">
-      <span class="legend-label">Pilier</span>
-      <div class="legend-item"><div class="legend-dot" style="background:#e0607a"></div>Transformation</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#a0506a"></div>Expertise</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#ffabbf"></div>Confiance</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#fff0f3;border:1px solid #ffabbf"></div>Connexion</div>
-    </div>
   </div>
 
-  <!-- CONTENT MAP VIEW -->
-  <div class="content-map" id="mapView"></div>
 
-  <div class="ig-footer">Ō Ma Biche · Feed Preview — Atelier Léman Digitale</div>
 </div>
 
 <!-- POST DETAIL MODAL -->
