@@ -177,7 +177,42 @@
   .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
   .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
 
-  /* ── FOOTER ── */
+  .ig-cell-num {
+    position: absolute; top: 6px; left: 6px;
+    font-size: 10px; font-weight: 700; color: #fff;
+    background: rgba(0,0,0,0.38);
+    width: 20px; height: 20px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s; letter-spacing: 0;
+  }
+  .ig-cell:hover .ig-cell-num { opacity: 1; }
+
+  .grid-stats {
+    padding: 10px 16px 6px;
+    display: flex; align-items: center; gap: 10px;
+    border-top: 0.5px solid #fde8ee;
+  }
+  .grid-counter { font-size: 11px; color: #ccc; white-space: nowrap; }
+  .grid-counter strong { color: #e0607a; font-weight: 600; }
+  .progress-bar-wrap { flex: 1; height: 3px; background: #fde8ee; border-radius: 3px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg,#ffabbf,#e0607a); border-radius: 3px; transition: width 0.4s ease; }
+
+  .pillar-filter {
+    padding: 0 16px 10px;
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+  .pf-btn {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px; color: #bbb; cursor: pointer;
+    padding: 3px 9px; border-radius: 20px;
+    border: 0.5px solid #fde8ee; background: transparent;
+    font-family: inherit; transition: all 0.15s;
+  }
+  .pf-btn:hover { background: #fff5f7; color: #e0607a; border-color: #ffabbf; }
+  .pf-btn.active { background: #fde8ee; color: #c05070; border-color: #ffabbf; font-weight: 600; }
+  .pf-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+  /* ── ig-footer ── */
   .ig-footer {
     padding: 10px 16px; border-top: 0.5px solid #fde8ee;
     font-size: 10px; color: #ddd; text-align: center; letter-spacing: 0.3px;
@@ -313,6 +348,19 @@
   <!-- GRID VIEW -->
   <div id="gridView">
     <div class="ig-grid" id="igGrid"></div>
+
+    <div class="grid-stats">
+      <div class="grid-counter"><strong id="publishedCount">0</strong> publiés · <strong id="scheduledCount">0</strong> planifiés · <strong id="draftCount">0</strong> brouillons</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
+    </div>
+
+    <div class="pillar-filter" id="pillarFilter">
+      <button class="pf-btn active" data-pillar="all" onclick="filterPillar('all',this)">Tous</button>
+      <button class="pf-btn" data-pillar="transformation" onclick="filterPillar('transformation',this)"><div class="pf-dot" style="background:#e0607a"></div>Transformation</button>
+      <button class="pf-btn" data-pillar="expertise" onclick="filterPillar('expertise',this)"><div class="pf-dot" style="background:#a0506a"></div>Expertise</button>
+      <button class="pf-btn" data-pillar="confiance" onclick="filterPillar('confiance',this)"><div class="pf-dot" style="background:#ffabbf"></div>Confiance</button>
+      <button class="pf-btn" data-pillar="connexion" onclick="filterPillar('connexion',this)"><div class="pf-dot" style="background:#fde8ee;border:1px solid #ffabbf"></div>Connexion</button>
+    </div>
   </div>
 
 
@@ -324,10 +372,12 @@
     <div id="modalImgArea"></div>
     <div class="modal-body">
       <div class="modal-header">
-        <div class="modal-title" id="modalTitle"></div>
-        <button class="modal-close" onclick="closeModal('postModal')">✕</button>
+        <button class="modal-close" onclick="closeModal('postModal')" style="margin-left:auto">✕</button>
       </div>
       <div class="modal-meta" id="modalMeta"></div>
+
+      <label class="field-label">Titre</label>
+      <input class="field-input" id="editTitle" placeholder="Titre du post..." />
 
       <label class="field-label">Statut</label>
       <select class="field-input" id="editStatus">
@@ -558,12 +608,24 @@ let posts = [
     hashtags:'#juillet #microshading #lausanne #omabiche #reservation' }
 ];
 
-/* ── RENDER GRID (12 premiers posts visibles) ── */
+let activeFilter = 'all';
+
+function filterPillar(pillar, btn) {
+  activeFilter = pillar;
+  document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+/* ── RENDER GRID ── */
 function renderGrid() {
   const grid = document.getElementById('igGrid');
   grid.innerHTML = '';
-  const visible = posts.slice(0, 12);
-  visible.forEach(post => {
+
+  const filtered = activeFilter === 'all' ? posts : posts.filter(p => p.pillar === activeFilter);
+  const visible = filtered.slice(0, 12);
+
+  visible.forEach((post, idx) => {
     const cell = document.createElement('div');
     cell.className = 'ig-cell';
     cell.onclick = () => openPostModal(post.id);
@@ -593,8 +655,28 @@ function renderGrid() {
     fmt.textContent = post.format === 'Reel' ? '▶' : post.format === 'Carousel' ? '⊞' : '□';
     cell.appendChild(fmt);
 
+    const num = document.createElement('div');
+    num.className = 'ig-cell-num';
+    num.textContent = posts.indexOf(post) + 1;
+    cell.appendChild(num);
+
     grid.appendChild(cell);
   });
+
+  updateStats();
+}
+
+function updateStats() {
+  const total = posts.length;
+  const pub = posts.filter(p => p.status === 'published').length;
+  const sch = posts.filter(p => p.status === 'scheduled').length;
+  const dra = posts.filter(p => p.status === 'draft').length;
+  const pct = total > 0 ? Math.round((pub + sch) / total * 100) : 0;
+
+  document.getElementById('publishedCount').textContent = pub;
+  document.getElementById('scheduledCount').textContent = sch;
+  document.getElementById('draftCount').textContent = dra;
+  document.getElementById('progressBar').style.width = pct + '%';
 }
 
 function makePlaceholder(post) {
@@ -656,19 +738,18 @@ function openPostModal(id) {
     ? `<img class="modal-img" src="${post.url}" alt="${post.title}" onerror="this.parentElement.innerHTML='<div class=modal-img-placeholder><svg width=48 height=48 viewBox=\\'0 0 24 24\\' fill=none stroke=#ffabbf stroke-width=1.2><rect x=3 y=3 width=18 height=18 rx=3/><circle cx=8.5 cy=8.5 r=1.5/><path d=\\'m21 15-5-5L5 21\\'/></svg></div>'" />`
     : `<div class="modal-img-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`;
 
-  document.getElementById('modalTitle').textContent = post.title;
   const p = PILLAR[post.pillar] || PILLAR.connexion;
-  document.getElementById('modalMeta').innerHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>${post.month ? '<span style="font-size:10px;color:#bbb">'+post.month+'</span>' : ''}`;
+  document.getElementById('modalMeta').innerHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>${post.month ? '<span style="font-size:10px;color:#ccc;margin-left:2px">'+post.month+'</span>' : ''}`;
 
-  const editStatus = document.getElementById('editStatus');
-  editStatus.value = post.status || 'draft';
-
+  document.getElementById('editTitle').value   = post.title || '';
+  document.getElementById('editStatus').value  = post.status || 'draft';
   document.getElementById('editCaption').value = post.caption || '';
-  document.getElementById('editHashtags').value = post.hashtags || '';
-  document.getElementById('editDate').value = post.date || '';
-  document.getElementById('urlInput').value = post.url || '';
+  document.getElementById('editHashtags').value= post.hashtags || '';
+  document.getElementById('editDate').value    = post.date || '';
+  document.getElementById('urlInput').value    = post.url || '';
 
   openModal('postModal');
+  setTimeout(() => document.getElementById('editTitle').focus(), 100);
 }
 
 function savePost() {
@@ -676,6 +757,10 @@ function savePost() {
   const post = posts.find(p => p.id === currentPostId);
   if (!post) return;
 
+  const newTitle = document.getElementById('editTitle').value.trim();
+  if (!newTitle) { document.getElementById('editTitle').focus(); showToast('Le titre ne peut pas être vide', '#e0607a'); return; }
+
+  post.title    = newTitle;
   post.status   = document.getElementById('editStatus').value;
   post.caption  = document.getElementById('editCaption').value.trim();
   post.hashtags = document.getElementById('editHashtags').value.trim();
@@ -684,12 +769,15 @@ function savePost() {
 
   renderGrid();
   closeModal('postModal');
+  showToast('✓ Modifications enregistrées');
+}
 
-  const toast = document.createElement('div');
-  toast.textContent = '✓ Modifications enregistrées';
-  toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#e0607a;color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:999;opacity:1;transition:opacity 0.5s';
-  document.body.appendChild(toast);
-  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 2000);
+function showToast(msg, color) {
+  const t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${color||'#e0607a'};color:#fff;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;opacity:1;transition:opacity 0.4s;pointer-events:none;white-space:nowrap`;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 400); }, 2000);
 }
 
 /* ── ADD MODAL ── */
@@ -722,6 +810,12 @@ function addPost() {
 function openModal(id) { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function handleModalClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+/* ── KEYBOARD SHORTCUTS ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeModal('postModal'); closeModal('addModal'); }
+  if (e.key === 'Enter' && e.metaKey && document.getElementById('postModal').classList.contains('open')) savePost();
+});
 
 renderGrid();
 </script>
