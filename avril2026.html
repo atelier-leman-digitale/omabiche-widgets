@@ -328,15 +328,28 @@
         <button class="modal-close" onclick="closeModal('postModal')">✕</button>
       </div>
       <div class="modal-meta" id="modalMeta"></div>
-      <div class="modal-caption" id="modalCaption"></div>
-      <div class="modal-hashtags" id="modalHashtags"></div>
-      <div class="modal-date" id="modalDate"></div>
+
+      <label class="field-label">Statut</label>
+      <select class="field-input" id="editStatus">
+        <option value="draft">Brouillon</option>
+        <option value="scheduled">Planifié</option>
+        <option value="published">Publié</option>
+      </select>
+
+      <label class="field-label">Caption</label>
+      <textarea class="field-input" id="editCaption" rows="4" placeholder="Texte du post..."></textarea>
+
+      <label class="field-label">Hashtags</label>
+      <input class="field-input" id="editHashtags" placeholder="#lausanne #microshading..." />
+
+      <label class="field-label">Date prévue</label>
+      <input class="field-input" id="editDate" placeholder="Ex: 14 avr. 2026" />
     </div>
     <div class="url-section">
-      <div class="section-divider">Ajouter / Modifier l'image</div>
+      <div class="section-divider">Image</div>
       <label class="field-label">URL image (Canva, Drive, hébergeur…)</label>
       <input class="field-input" type="url" id="urlInput" placeholder="https://..." />
-      <button class="apply-btn" onclick="applyUrl()">Mettre à jour l'image</button>
+      <button class="apply-btn" onclick="savePost()">Enregistrer les modifications</button>
     </div>
   </div>
 </div>
@@ -640,26 +653,43 @@ function openPostModal(id) {
 
   const imgArea = document.getElementById('modalImgArea');
   imgArea.innerHTML = post.url
-    ? `<img class="modal-img" src="${post.url}" alt="${post.title}" />`
+    ? `<img class="modal-img" src="${post.url}" alt="${post.title}" onerror="this.parentElement.innerHTML='<div class=modal-img-placeholder><svg width=48 height=48 viewBox=\\'0 0 24 24\\' fill=none stroke=#ffabbf stroke-width=1.2><rect x=3 y=3 width=18 height=18 rx=3/><circle cx=8.5 cy=8.5 r=1.5/><path d=\\'m21 15-5-5L5 21\\'/></svg></div>'" />`
     : `<div class="modal-img-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`;
 
   document.getElementById('modalTitle').textContent = post.title;
-  const s = STATUS[post.status] || STATUS.draft;
   const p = PILLAR[post.pillar] || PILLAR.connexion;
-  document.getElementById('modalMeta').innerHTML = `<span class="status-badge ${s.cls}">${s.label}</span><span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>`;
-  document.getElementById('modalCaption').textContent = post.caption || '—';
-  document.getElementById('modalHashtags').textContent = post.hashtags || '';
-  document.getElementById('modalDate').textContent = post.date ? '📅 ' + post.date + (post.month ? ' · ' + post.month : '') : '';
+  document.getElementById('modalMeta').innerHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>${post.month ? '<span style="font-size:10px;color:#bbb">'+post.month+'</span>' : ''}`;
+
+  const editStatus = document.getElementById('editStatus');
+  editStatus.value = post.status || 'draft';
+
+  document.getElementById('editCaption').value = post.caption || '';
+  document.getElementById('editHashtags').value = post.hashtags || '';
+  document.getElementById('editDate').value = post.date || '';
   document.getElementById('urlInput').value = post.url || '';
+
   openModal('postModal');
 }
 
-function applyUrl() {
+function savePost() {
   if (currentPostId === null) return;
-  const url = document.getElementById('urlInput').value.trim();
   const post = posts.find(p => p.id === currentPostId);
-  if (post) { post.url = url; renderGrid(); }
+  if (!post) return;
+
+  post.status   = document.getElementById('editStatus').value;
+  post.caption  = document.getElementById('editCaption').value.trim();
+  post.hashtags = document.getElementById('editHashtags').value.trim();
+  post.date     = document.getElementById('editDate').value.trim();
+  post.url      = document.getElementById('urlInput').value.trim();
+
+  renderGrid();
   closeModal('postModal');
+
+  const toast = document.createElement('div');
+  toast.textContent = '✓ Modifications enregistrées';
+  toast.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#e0607a;color:#fff;padding:8px 18px;border-radius:20px;font-size:12px;font-weight:600;z-index:999;opacity:1;transition:opacity 0.5s';
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 2000);
 }
 
 /* ── ADD MODAL ── */
