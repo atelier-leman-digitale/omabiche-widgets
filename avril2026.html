@@ -925,7 +925,7 @@ function validateImageUrl(url) {
   // Canva design link — not a direct image
   if (url.includes('canva.com/design')) {
     hint.style.color = '#e0607a';
-    hint.innerHTML = '⚠ Lien Canva non compatible.<br>Dans Canva : <strong>Partager → Télécharger → PNG</strong><br>Puis héberge l'image (Drive, Cloudinary, Imgur…)';
+    hint.innerHTML = "⚠ Lien Canva non compatible.<br>Dans Canva : <strong>Partager → Télécharger → PNG</strong><br>Puis héberge l'image sur Drive, puis colle le lien ici.";
     return;
   }
   // Dropbox — check for raw
@@ -941,7 +941,7 @@ function validateImageUrl(url) {
   }
   // Unknown — neutral
   hint.style.color = '#bbb';
-  hint.textContent = 'Lien externe — s'affiche uniquement si c'est une image directe (.jpg, .png…)';
+  hint.textContent = "Lien externe — s'affiche uniquement si c'est une image directe (.jpg, .png…)";
 }
 
 function showToast(msg, color) {
