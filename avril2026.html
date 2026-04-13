@@ -381,7 +381,7 @@ body.present-mode .present-bar { display: flex; }
 
   <!-- TOP BAR -->
   <div class="top-bar">
-    <span class="top-bar-title">Ō Ma Biche · Feed Avril 2026 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
+    <span class="top-bar-title">Ō Ma Biche · Feed Mois 1 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
     <div class="top-bar-right">
       <span class="save-indicator" id="saveIndicator">● chargement…</span>
       <button class="icon-btn" onclick="enterPresent()" title="Mode présentation">Présenter</button>
@@ -478,8 +478,9 @@ body.present-mode .present-bar { display: flex; }
 
     <div class="url-section">
       <div class="section-divider">Image & Vidéo</div>
-      <label class="field-label">URL Cover / Image (Canva, Drive…)</label>
+      <label class="field-label">URL Cover / Image</label>
       <input class="field-input" type="url" id="urlInput" placeholder="https://..." />
+      <div id="urlHint" style="font-size:10px;color:#bbb;margin-top:4px;line-height:1.5;display:none"></div>
       <label class="field-label">URL Vidéo Reel (.mp4, Drive, Dropbox…)</label>
       <input class="field-input" type="url" id="videoInput" placeholder="https://..." />
       <button class="apply-btn" onclick="savePost()">Enregistrer — ⌘↵</button>
@@ -588,21 +589,21 @@ let saveTimer = null;
 async function loadPosts() {
   setSaveIndicator('saving', '● chargement…');
   try {
-    const res = await fetch(APPS_SCRIPT_URL + '?method=load', { method: 'GET' });
+    // GET only — contourne le CORS (pas de preflight OPTIONS)
+    const res = await fetch(APPS_SCRIPT_URL + '?method=load');
     const data = await res.json();
     if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
       posts = data.posts;
-      setSaveIndicator('saved', '● synchronisé ✓');
+      setSaveIndicator('saved', '● Google Sheets ✓');
     } else {
-      // Feuille vide → charger les posts par défaut et les sauvegarder
       posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
       setSaveIndicator('saving', '● initialisation…');
       await _pushToSheets();
     }
   } catch(e) {
-    // Erreur réseau → fallback sur les posts par défaut
     posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
     setSaveIndicator('', '⚠ hors ligne — données locales');
+    console.warn('loadPosts error:', e);
   }
   renderGrid();
 }
@@ -617,19 +618,20 @@ async function savePosts() {
 
 async function _pushToSheets() {
   try {
-    const res = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: JSON.stringify({ posts }),
-      headers: { 'Content-Type': 'application/json' }
-    });
+    // Encode les données en GET pour éviter le CORS preflight
+    const encoded = encodeURIComponent(JSON.stringify({ posts }));
+    const url = APPS_SCRIPT_URL + '?method=save&data=' + encoded;
+    const res = await fetch(url);
     const data = await res.json();
     if (data.ok) {
       setSaveIndicator('saved', '● Google Sheets ✓');
     } else {
       setSaveIndicator('', '⚠ erreur : ' + (data.error || '?'));
+      console.warn('Sheets error:', data.error);
     }
   } catch(e) {
     setSaveIndicator('', '⚠ erreur réseau');
+    console.warn('_pushToSheets error:', e);
   }
 }
 
@@ -824,6 +826,12 @@ function openPostModal(id) {
   document.getElementById('copyHashtagsBtn').textContent = 'Copier';
   document.getElementById('copyHashtagsBtn').classList.remove('copied');
 
+  // Validate and hint on URL type
+  validateImageUrl(document.getElementById('urlInput').value);
+  document.getElementById('urlInput').addEventListener('input', function() {
+    validateImageUrl(this.value);
+  }, { once: false });
+
   updateCaptionCounter();
   updateNavButtons();
   openModal('postModal');
@@ -886,6 +894,55 @@ function closeModal(id) {
   document.getElementById(id).classList.remove('open');
 }
 function handleModalClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+function validateImageUrl(url) {
+  const hint = document.getElementById('urlHint');
+  if (!url) { hint.style.display = 'none'; return; }
+  hint.style.display = 'block';
+
+  // Direct image extensions — OK
+  if (/\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i.test(url)) {
+    hint.style.color = '#4caf82';
+    hint.textContent = '✓ Lien image direct — compatible';
+    return;
+  }
+  // Google Drive view link — OK
+  if (url.includes('drive.google.com/uc?export=view') || url.includes('drive.google.com/uc?id')) {
+    hint.style.color = '#4caf82';
+    hint.textContent = '✓ Google Drive (format correct)';
+    return;
+  }
+  // Google Drive share link — needs converting
+  if (url.includes('drive.google.com') && url.includes('/file/d/')) {
+    const match = url.match(/\/file\/d\/([^/]+)/);
+    if (match) {
+      const direct = 'https://drive.google.com/uc?export=view&id=' + match[1];
+      hint.style.color = '#e0607a';
+      hint.innerHTML = '⚠ Lien Drive à convertir :<br><strong style="user-select:all;font-size:10px">' + direct + '</strong><br><span style="color:#bbb">Copie ce lien et colle-le ici</span>';
+      return;
+    }
+  }
+  // Canva design link — not a direct image
+  if (url.includes('canva.com/design')) {
+    hint.style.color = '#e0607a';
+    hint.innerHTML = '⚠ Lien Canva non compatible.<br>Dans Canva : <strong>Partager → Télécharger → PNG</strong><br>Puis héberge l'image (Drive, Cloudinary, Imgur…)';
+    return;
+  }
+  // Dropbox — check for raw
+  if (url.includes('dropbox.com')) {
+    if (url.includes('raw=1')) {
+      hint.style.color = '#4caf82';
+      hint.textContent = '✓ Dropbox (format correct)';
+    } else {
+      hint.style.color = '#e0607a';
+      hint.textContent = '⚠ Dropbox : remplace ?dl=0 par ?raw=1 à la fin du lien';
+    }
+    return;
+  }
+  // Unknown — neutral
+  hint.style.color = '#bbb';
+  hint.textContent = 'Lien externe — s'affiche uniquement si c'est une image directe (.jpg, .png…)';
+}
 
 function showToast(msg, color) {
   const t = document.createElement('div');
