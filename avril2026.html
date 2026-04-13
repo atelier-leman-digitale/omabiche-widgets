@@ -5,454 +5,550 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Ō Ma Biche — Feed Preview</title>
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  body {
-    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
-    background: #fff;
-    min-height: 100vh;
-    padding: 0; margin: 0;
-  }
+body {
+  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  background: #fff5f7;
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20px 16px 40px;
+}
 
-  .ig-wrapper {
-    width: 100%;
-    max-width: 100%;
-    background: #fff;
-    
-    border-radius: 0;
-    overflow: hidden;
-  }
+/* ── WRAPPER ── */
+.ig-wrapper {
+  width: 100%; max-width: 480px;
+  background: #fff;
+  border: 0.5px solid #f5c8d4;
+  border-radius: 16px;
+  overflow: hidden;
+}
 
-  /* ── PROFILE ── */
-  .ig-profile {
-    padding: 16px;
-    border-bottom: 0.5px solid #fde8ee;
-  }
+/* ── TOP BAR ── */
+.top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 0.5px solid #fde8ee;
+  background: #fff;
+}
+.top-bar-title {
+  font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.2px;
+}
+.top-bar-right { display: flex; gap: 6px; align-items: center; }
 
-  .ig-profile-top {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 12px;
-  }
+.icon-btn {
+  font-size: 11px; font-weight: 600; color: #e0607a;
+  border: 0.5px solid #fde8ee; background: transparent;
+  cursor: pointer; padding: 4px 10px; border-radius: 20px;
+  font-family: inherit; transition: all 0.15s; white-space: nowrap;
+}
+.icon-btn:hover { background: #fde8ee; }
+.icon-btn.active { background: #ffabbf; color: #fff; border-color: #ffabbf; }
 
-  .ig-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ffabbf, #f07090);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #fff;
-    font-size: 20px;
-    font-weight: 600;
-    flex-shrink: 0;
-    border: 2.5px solid #ffabbf;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #ffabbf;
-  }
+.save-indicator {
+  font-size: 10px; color: #bbb; letter-spacing: 0.2px;
+  transition: color 0.3s;
+}
+.save-indicator.saved { color: #4caf82; }
+.save-indicator.saving { color: #ffabbf; }
 
-  .ig-username { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
-  .ig-name { font-size: 12px; color: #aaa; }
+/* ── GRID ── */
+.ig-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  background: #fde8ee;
+  width: 100%;
+}
 
-  .ig-stats { display: flex; gap: 24px; margin-bottom: 10px; }
-  .ig-stat { text-align: center; }
-  .ig-stat-num { font-size: 15px; font-weight: 600; color: #1a1a1a; display: block; }
-  .ig-stat-label { font-size: 11px; color: #aaa; }
+.ig-cell {
+  aspect-ratio: 1;
+  position: relative;
+  background: #fce0e8;
+  cursor: pointer;
+  overflow: hidden;
+}
+.ig-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform 0.25s;
+}
+.ig-cell:hover img { transform: scale(1.04); }
 
-  .ig-bio { font-size: 12px; color: #3a3a3a; line-height: 1.6; margin-bottom: 8px; }
-  .ig-link { font-size: 12px; color: #e0607a; font-weight: 500; }
+.ig-cell-placeholder {
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 6px; background: #fff0f3;
+  transition: background 0.2s;
+}
+.ig-cell:hover .ig-cell-placeholder { background: #fde8ee; }
+.ig-cell-placeholder svg { opacity: 0.3; }
+.ig-cell-placeholder-label {
+  font-size: 9px; color: #d4a0ac; text-align: center;
+  padding: 0 8px; line-height: 1.3; font-weight: 500;
+}
 
-  .ig-follow-btn {
-    display: inline-block;
-    background: #ffabbf;
-    color: #fff;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 6px 20px;
-    border-radius: 8px;
-    border: none;
-    cursor: default;
-    margin-top: 10px;
-    letter-spacing: 0.3px;
-  }
+.ig-cell-overlay {
+  position: absolute; inset: 0;
+  background: rgba(224,96,122,0);
+  display: flex; align-items: flex-start; justify-content: flex-end;
+  padding: 6px; transition: background 0.2s;
+}
+.ig-cell:hover .ig-cell-overlay { background: rgba(224,96,122,0.12); }
 
-  /* ── TABS ── */
-  /* ── GRID ── */
-  .ig-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 2px;
-    background: #fde8ee;
-    width: 100%;
-  }
+.status-badge {
+  font-size: 9px; font-weight: 600; padding: 2px 6px;
+  border-radius: 20px; letter-spacing: 0.4px; text-transform: uppercase;
+}
+.status-published { background: #d4f0e4; color: #1a6b40; }
+.status-scheduled  { background: #fff3cd; color: #7a5000; }
+.status-draft      { background: #fde8ee; color: #c05070; }
 
-  .ig-cell {
-    aspect-ratio: 1;
-    position: relative;
-    background: #fce0e8;
-    cursor: pointer;
-    overflow: hidden;
-  }
+.ig-cell-pillar {
+  position: absolute; bottom: 6px; left: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.8);
+}
+.pillar-transformation { background: #e0607a; }
+.pillar-expertise      { background: #a0506a; }
+.pillar-confiance      { background: #ffabbf; }
+.pillar-connexion      { background: #fff0f3; border: 1.5px solid #ffabbf; }
 
-  .ig-cell img {
-    width: 100%; height: 100%;
-    object-fit: cover; display: block;
-    transition: transform 0.25s;
-  }
-  .ig-cell:hover img { transform: scale(1.04); }
+.format-icon {
+  position: absolute; bottom: 6px; right: 6px;
+  font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px;
+  background: rgba(255,255,255,0.85); color: #c05070; letter-spacing: 0.3px;
+}
+.format-icon.has-video { background: rgba(224,96,122,0.9); color: #fff; }
 
-  .ig-cell-placeholder {
-    width: 100%; height: 100%;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    gap: 6px; background: #fff0f3;
-    transition: background 0.2s;
-  }
-  .ig-cell:hover .ig-cell-placeholder { background: #fde8ee; }
-  .ig-cell-placeholder svg { opacity: 0.3; }
-  .ig-cell-placeholder-label {
-    font-size: 9px; color: #d4a0ac;
-    text-align: center; padding: 0 8px; line-height: 1.3;
-    font-weight: 500;
-  }
+.ig-cell-num {
+  position: absolute; top: 6px; left: 6px;
+  font-size: 10px; font-weight: 700; color: #fff;
+  background: rgba(0,0,0,0.38);
+  width: 20px; height: 20px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.2s;
+}
+.ig-cell:hover .ig-cell-num { opacity: 1; }
 
-  .ig-cell-overlay {
-    position: absolute; inset: 0;
-    background: rgba(224,96,122,0);
-    display: flex; align-items: flex-start; justify-content: flex-end;
-    padding: 6px; transition: background 0.2s;
-  }
-  .ig-cell:hover .ig-cell-overlay { background: rgba(224,96,122,0.12); }
+/* ── STATS BAR ── */
+.grid-stats {
+  padding: 10px 14px 6px;
+  display: flex; align-items: center; gap: 10px;
+  border-top: 0.5px solid #fde8ee;
+}
+.grid-counter { font-size: 11px; color: #ccc; white-space: nowrap; }
+.grid-counter strong { color: #e0607a; font-weight: 600; }
+.progress-bar-wrap { flex: 1; height: 3px; background: #fde8ee; border-radius: 3px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: linear-gradient(90deg,#ffabbf,#e0607a); border-radius: 3px; transition: width 0.4s ease; }
 
-  /* ── BADGES ── */
-  .status-badge {
-    font-size: 9px; font-weight: 600;
-    padding: 2px 6px; border-radius: 20px;
-    letter-spacing: 0.4px; text-transform: uppercase;
-  }
-  .status-published { background: #d4f0e4; color: #1a6b40; }
-  .status-scheduled { background: #fff3cd; color: #7a5000; }
-  .status-draft { background: #fde8ee; color: #c05070; }
+/* ── PILLAR FILTER ── */
+.pillar-filter {
+  padding: 0 14px 10px;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.pf-btn {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 10px; color: #bbb; cursor: pointer;
+  padding: 3px 9px; border-radius: 20px;
+  border: 0.5px solid #fde8ee; background: transparent;
+  font-family: inherit; transition: all 0.15s;
+}
+.pf-btn:hover { background: #fff5f7; color: #e0607a; border-color: #ffabbf; }
+.pf-btn.active { background: #fde8ee; color: #c05070; border-color: #ffabbf; font-weight: 600; }
+.pf-dot { width: 7px; height: 7px; border-radius: 50%; }
 
-  .ig-cell-pillar {
-    position: absolute; bottom: 6px; left: 6px;
-    width: 7px; height: 7px; border-radius: 50%;
-    border: 1.5px solid rgba(255,255,255,0.8);
-  }
-  .pillar-transformation { background: #e0607a; }
-  .pillar-expertise      { background: #a0506a; }
-  .pillar-confiance      { background: #ffabbf; }
-  .pillar-connexion      { background: #fff0f3; border: 1.5px solid #ffabbf; }
+/* ── ADD BUTTON ── */
+.add-post-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin: 10px 14px; padding: 9px;
+  border: 1px dashed #ffabbf; border-radius: 8px;
+  font-size: 12px; color: #e0607a; cursor: pointer;
+  background: transparent; width: calc(100% - 28px);
+  font-family: inherit; transition: background 0.2s;
+}
+.add-post-btn:hover { background: #fff5f7; }
 
-  /* ── FORMAT ICONS ── */
-  .format-icon {
-    position: absolute; bottom: 6px; right: 6px;
-    font-size: 9px; font-weight: 700;
-    padding: 2px 5px; border-radius: 4px;
-    background: rgba(255,255,255,0.85);
-    color: #c05070; letter-spacing: 0.3px;
-  }
+/* ── FOOTER ── */
+.ig-footer {
+  padding: 8px 14px; border-top: 0.5px solid #fde8ee;
+  font-size: 10px; color: #ddd; text-align: center; letter-spacing: 0.3px;
+}
 
-  /* ── ADD BUTTON ── */
-  .add-post-btn {
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    margin: 14px; padding: 10px;
-    border: 1px dashed #ffabbf; border-radius: 8px;
-    font-size: 12px; color: #e0607a; cursor: pointer;
-    background: transparent; width: calc(100% - 28px);
-    font-family: inherit; transition: background 0.2s;
-  }
-  .add-post-btn:hover { background: #fff5f7; }
+/* ── MODAL OVERLAY ── */
+.modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 200;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal.open { display: flex; }
+.modal-card {
+  background: #fff; border-radius: 14px;
+  width: 100%; max-width: 360px; max-height: 92vh;
+  overflow-y: auto; border: 0.5px solid #fde8ee;
+}
 
-  /* ── LEGEND ── */
-  .legend {
-    padding: 10px 16px; border-top: 0.5px solid #fde8ee;
-    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
-  }
-  .legend-label {
-    font-size: 10px; color: #ccc; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px; margin-right: 2px;
-  }
-  .legend-item { display: flex; align-items: center; gap: 5px; font-size: 10px; color: #888; }
-  .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+/* ── MODAL MEDIA ── */
+.modal-img {
+  width: 100%; aspect-ratio: 1; object-fit: cover;
+  background: #fde8ee; border-radius: 14px 14px 0 0; display: block;
+}
+.modal-img-placeholder {
+  width: 100%; aspect-ratio: 1; background: #fff0f3;
+  border-radius: 14px 14px 0 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-video {
+  width: 100%; aspect-ratio: 9/16; max-height: 360px;
+  object-fit: contain; background: #111;
+  border-radius: 14px 14px 0 0; display: block;
+}
 
-  .ig-cell-num {
-    position: absolute; top: 6px; left: 6px;
-    font-size: 10px; font-weight: 700; color: #fff;
-    background: rgba(0,0,0,0.38);
-    width: 20px; height: 20px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    opacity: 0; transition: opacity 0.2s; letter-spacing: 0;
-  }
-  .ig-cell:hover .ig-cell-num { opacity: 1; }
+/* ── MODAL NAV ── */
+.modal-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; border-bottom: 0.5px solid #fde8ee;
+}
+.nav-btn {
+  font-size: 11px; font-weight: 600; color: #e0607a;
+  border: none; background: none; cursor: pointer;
+  padding: 4px 8px; border-radius: 6px; font-family: inherit;
+  transition: background 0.15s;
+}
+.nav-btn:hover:not(:disabled) { background: #fde8ee; }
+.nav-btn:disabled { color: #ddd; cursor: default; }
 
-  .grid-stats {
-    padding: 10px 16px 6px;
-    display: flex; align-items: center; gap: 10px;
-    border-top: 0.5px solid #fde8ee;
-  }
-  .grid-counter { font-size: 11px; color: #ccc; white-space: nowrap; }
-  .grid-counter strong { color: #e0607a; font-weight: 600; }
-  .progress-bar-wrap { flex: 1; height: 3px; background: #fde8ee; border-radius: 3px; overflow: hidden; }
-  .progress-bar-fill { height: 100%; background: linear-gradient(90deg,#ffabbf,#e0607a); border-radius: 3px; transition: width 0.4s ease; }
+/* ── MODAL BODY ── */
+.modal-body { padding: 14px; }
+.modal-header {
+  display: flex; align-items: center;
+  justify-content: flex-end; margin-bottom: 8px;
+}
+.modal-close {
+  width: 28px; height: 28px; border: none;
+  background: #fde8ee; border-radius: 50%;
+  cursor: pointer; font-size: 14px; color: #c05070;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-meta { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
 
-  .pillar-filter {
-    padding: 0 16px 10px;
-    display: flex; flex-wrap: wrap; gap: 6px;
-  }
-  .pf-btn {
-    display: flex; align-items: center; gap: 4px;
-    font-size: 10px; color: #bbb; cursor: pointer;
-    padding: 3px 9px; border-radius: 20px;
-    border: 0.5px solid #fde8ee; background: transparent;
-    font-family: inherit; transition: all 0.15s;
-  }
-  .pf-btn:hover { background: #fff5f7; color: #e0607a; border-color: #ffabbf; }
-  .pf-btn.active { background: #fde8ee; color: #c05070; border-color: #ffabbf; font-weight: 600; }
-  .pf-dot { width: 7px; height: 7px; border-radius: 50%; }
+.pillar-tag {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
+.pt-transformation { background: #fde8ee; color: #c04060; }
+.pt-expertise      { background: #f5edf0; color: #804050; }
+.pt-confiance      { background: #fff0f3; color: #b06070; }
+.pt-connexion      { background: #faf8f5; color: #a08080; border: 1px solid #fde8ee; }
+.format-tag {
+  font-size: 10px; padding: 2px 8px; border-radius: 20px;
+  background: #fff3cd; color: #7a5000; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.4px;
+}
 
-  /* ── ig-footer ── */
-  .ig-footer {
-    padding: 10px 16px; border-top: 0.5px solid #fde8ee;
-    font-size: 10px; color: #ddd; text-align: center; letter-spacing: 0.3px;
-  }
+/* ── FORM FIELDS ── */
+.field-label {
+  font-size: 10px; color: #bbb; margin-bottom: 3px;
+  display: block; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.4px;
+  font-weight: 600;
+}
+.field-label:first-child { margin-top: 0; }
+.field-input {
+  width: 100%; padding: 7px 10px; font-size: 12px;
+  border: 0.5px solid #fde8ee; border-radius: 8px;
+  outline: none; color: #333; background: #fff8fa;
+  font-family: inherit; transition: border-color 0.2s;
+}
+.field-input:focus { border-color: #ffabbf; }
+textarea.field-input { resize: vertical; }
 
-  /* ── MODAL OVERLAY ── */
-  .modal {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.6); z-index: 200;
-    align-items: center; justify-content: center; padding: 24px;
-  }
-  .modal.open { display: flex; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+.field-row > div { display: flex; flex-direction: column; }
+.field-row .field-label { margin-top: 0; }
 
-  .modal-card {
-    background: #fff; border-radius: 14px;
-    width: 100%; max-width: 360px; max-height: 90vh;
-    overflow-y: auto; position: relative;
-    border: 0.5px solid #fde8ee;
-  }
+/* ── CAPTION COUNTER ── */
+.caption-wrap { position: relative; margin-top: 10px; }
+.caption-counter {
+  position: absolute; bottom: 8px; right: 8px;
+  font-size: 10px; color: #ccc; pointer-events: none;
+  background: rgba(255,248,250,0.9); padding: 1px 4px; border-radius: 4px;
+  font-weight: 500; transition: color 0.2s;
+}
+.caption-counter.ok      { color: #4caf82; }
+.caption-counter.warning { color: #e0607a; }
+.caption-counter.over    { color: #c03040; }
+.caption-hint {
+  font-size: 10px; margin-top: 3px; letter-spacing: 0.2px;
+}
+.caption-hint.ok      { color: #4caf82; }
+.caption-hint.warning { color: #ff8c00; }
+.caption-hint.over    { color: #c03040; }
 
-  .modal-img {
-    width: 100%; aspect-ratio: 1; object-fit: cover;
-    background: #fde8ee; border-radius: 14px 14px 0 0; display: block;
-  }
-  .modal-img-placeholder {
-    width: 100%; aspect-ratio: 1; background: #fff0f3;
-    border-radius: 14px 14px 0 0;
-    display: flex; align-items: center; justify-content: center;
-  }
+/* ── COPY BUTTON ── */
+.field-with-copy { position: relative; }
+.copy-btn {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  font-size: 10px; font-weight: 600; color: #e0607a;
+  background: rgba(255,248,250,0.9); border: none; cursor: pointer;
+  padding: 2px 7px; border-radius: 4px; font-family: inherit;
+  transition: background 0.15s;
+}
+.copy-btn:hover { background: #fde8ee; }
+.copy-btn.copied { color: #4caf82; }
+.field-with-copy .field-input { padding-right: 56px; }
 
-  .modal-body { padding: 16px; }
-  .modal-header {
-    display: flex; align-items: center;
-    justify-content: space-between; margin-bottom: 10px;
-  }
-  .modal-title { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-  .modal-close {
-    width: 28px; height: 28px; border: none;
-    background: #fde8ee; border-radius: 50%;
-    cursor: pointer; font-size: 14px;
-    display: flex; align-items: center; justify-content: center; color: #c05070;
-  }
-  .modal-meta { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; flex-wrap: wrap; }
-  .modal-caption { font-size: 12px; color: #555; line-height: 1.7; margin-bottom: 10px; }
-  .modal-hashtags { font-size: 11px; color: #e0607a; margin-bottom: 8px; }
-  .modal-date { font-size: 11px; color: #bbb; }
+/* ── URL SECTION ── */
+.url-section {
+  padding: 12px 14px 14px;
+  border-top: 0.5px solid #fde8ee;
+}
+.section-divider {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: #ddd; font-weight: 600; margin-bottom: 8px;
+}
+.apply-btn {
+  margin-top: 12px; padding: 9px 14px; font-size: 12px;
+  background: #ffabbf; color: #fff; border: none; border-radius: 8px;
+  cursor: pointer; width: 100%; font-family: inherit; font-weight: 600;
+  transition: background 0.2s; letter-spacing: 0.3px;
+}
+.apply-btn:hover { background: #e0607a; }
 
-  /* ── TAGS ── */
-  .pillar-tag {
-    font-size: 10px; font-weight: 600;
-    padding: 2px 8px; border-radius: 20px;
-    text-transform: uppercase; letter-spacing: 0.4px;
-  }
-  .pt-transformation { background: #fde8ee; color: #c04060; }
-  .pt-expertise      { background: #f5edf0; color: #804050; }
-  .pt-confiance      { background: #fff0f3; color: #b06070; }
-  .pt-connexion      { background: #faf8f5; color: #a08080; border: 1px solid #fde8ee; }
+/* ── PRESENTATION MODE ── */
+body.present-mode .ig-wrapper {
+  border: none;
+  border-radius: 0;
+  max-width: 100%;
+}
+body.present-mode .top-bar { display: none; }
+body.present-mode .grid-stats { display: none; }
+body.present-mode .pillar-filter { display: none; }
+body.present-mode .add-post-btn { display: none; }
+body.present-mode .ig-footer { display: none; }
+body.present-mode .ig-cell { cursor: default; }
+body.present-mode .ig-cell-num { display: none; }
 
-  .format-tag {
-    font-size: 10px; padding: 2px 8px; border-radius: 20px;
-    background: #fff3cd; color: #7a5000;
-    text-transform: uppercase; letter-spacing: 0.4px; font-weight: 600;
-  }
+.present-bar {
+  display: none;
+  padding: 10px 14px;
+  background: #3b0510;
+  align-items: center; justify-content: space-between;
+}
+body.present-mode .present-bar { display: flex; }
+.present-bar-title { font-size: 12px; color: #ffabbf; font-weight: 600; letter-spacing: 0.3px; }
+.present-exit-btn {
+  font-size: 11px; color: #fff; background: rgba(255,171,191,0.2);
+  border: 0.5px solid rgba(255,171,191,0.4); border-radius: 20px;
+  padding: 4px 12px; cursor: pointer; font-family: inherit; transition: background 0.15s;
+}
+.present-exit-btn:hover { background: rgba(255,171,191,0.35); }
 
-  /* ── INPUTS ── */
-  .field-label {
-    font-size: 11px; color: #bbb; margin-bottom: 4px;
-    display: block; margin-top: 10px;
-  }
-  .field-label:first-child { margin-top: 0; }
-  .field-input {
-    width: 100%; padding: 7px 10px; font-size: 12px;
-    border: 0.5px solid #fde8ee; border-radius: 8px;
-    outline: none; color: #333; background: #fff8fa;
-    font-family: inherit; transition: border-color 0.2s;
-  }
-  .field-input:focus { border-color: #ffabbf; }
-  textarea.field-input { resize: vertical; }
-
-  .apply-btn {
-    margin-top: 12px; padding: 8px 14px; font-size: 12px;
-    background: #ffabbf; color: #fff;
-    border: none; border-radius: 8px; cursor: pointer;
-    width: 100%; font-family: inherit; font-weight: 600;
-    transition: background 0.2s; letter-spacing: 0.3px;
-  }
-  .apply-btn:hover { background: #e0607a; }
-
-  .url-section {
-    padding: 14px 16px 16px;
-    border-top: 0.5px solid #fde8ee;
-  }
-  .section-divider {
-    font-size: 10px; text-transform: uppercase;
-    letter-spacing: 0.5px; color: #ddd; font-weight: 600; margin-bottom: 8px;
-  }
-
-  /* ── CONTENT MAP ── */
-  .content-map { padding: 12px 16px; display: none; }
-  .content-map.visible { display: block; }
-
-  .map-row {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 0; border-bottom: 0.5px solid #fde8ee; cursor: pointer;
-    transition: background 0.15s; margin: 0 -4px; padding-left: 4px;
-    border-radius: 6px;
-  }
-  .map-row:last-child { border-bottom: none; }
-  .map-row:hover { background: #fff5f7; }
-
-  .map-num { font-size: 11px; color: #ddd; width: 18px; text-align: right; flex-shrink: 0; }
-  .map-pillar-bar { width: 4px; height: 36px; border-radius: 3px; flex-shrink: 0; }
-  .map-info { flex: 1; min-width: 0; }
-  .map-title { font-size: 12px; font-weight: 500; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .map-meta { font-size: 10px; color: #bbb; margin-top: 2px; }
-  .map-status { flex-shrink: 0; }
-
-  /* ── MONTH SEPARATOR ── */
-  .month-sep {
-    font-size: 10px; font-weight: 600; color: #ffabbf;
-    text-transform: uppercase; letter-spacing: 0.8px;
-    padding: 8px 0 4px;
-    border-bottom: 0.5px solid #fde8ee;
-    margin-bottom: 4px;
-  }
+/* ── ADD MODAL ── */
+.content-map { padding: 12px 14px; display: none; }
+.content-map.visible { display: block; }
+.month-sep {
+  font-size: 10px; font-weight: 600; color: #ffabbf;
+  text-transform: uppercase; letter-spacing: 0.8px;
+  padding: 8px 0 4px; border-bottom: 0.5px solid #fde8ee; margin-bottom: 4px;
+}
+.map-row {
+  display: flex; align-items: center; gap: 10px; padding: 9px 0;
+  border-bottom: 0.5px solid #fde8ee; cursor: pointer;
+  border-radius: 6px; transition: background 0.15s;
+}
+.map-row:last-child { border-bottom: none; }
+.map-row:hover { background: #fff5f7; }
+.map-num { font-size: 11px; color: #ddd; width: 18px; text-align: right; flex-shrink: 0; }
+.map-pillar-bar { width: 4px; height: 34px; border-radius: 3px; flex-shrink: 0; }
+.map-info { flex: 1; min-width: 0; }
+.map-title { font-size: 12px; font-weight: 500; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.map-meta { font-size: 10px; color: #bbb; margin-top: 1px; }
+.map-status { flex-shrink: 0; }
 </style>
 </head>
 <body>
 
 <div class="ig-wrapper">
 
+  <!-- PRESENTATION MODE BAR -->
+  <div class="present-bar">
+    <span class="present-bar-title">Ō Ma Biche — Aperçu feed Instagram</span>
+    <button class="present-exit-btn" onclick="exitPresent()">✕ Quitter</button>
+  </div>
 
-  <!-- GRID VIEW -->
-  <div id="gridView">
-    <div class="ig-grid" id="igGrid"></div>
-
-    <div class="grid-stats">
-      <div class="grid-counter"><strong id="publishedCount">0</strong> publiés · <strong id="scheduledCount">0</strong> planifiés · <strong id="draftCount">0</strong> brouillons</div>
-      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progressBar" style="width:0%"></div></div>
-    </div>
-
-    <div class="pillar-filter" id="pillarFilter">
-      <button class="pf-btn active" data-pillar="all" onclick="filterPillar('all',this)">Tous</button>
-      <button class="pf-btn" data-pillar="transformation" onclick="filterPillar('transformation',this)"><div class="pf-dot" style="background:#e0607a"></div>Transformation</button>
-      <button class="pf-btn" data-pillar="expertise" onclick="filterPillar('expertise',this)"><div class="pf-dot" style="background:#a0506a"></div>Expertise</button>
-      <button class="pf-btn" data-pillar="confiance" onclick="filterPillar('confiance',this)"><div class="pf-dot" style="background:#ffabbf"></div>Confiance</button>
-      <button class="pf-btn" data-pillar="connexion" onclick="filterPillar('connexion',this)"><div class="pf-dot" style="background:#fde8ee;border:1px solid #ffabbf"></div>Connexion</button>
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <span class="top-bar-title">Ō Ma Biche · Feed Mois 1 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
+    <div class="top-bar-right">
+      <span class="save-indicator" id="saveIndicator">● chargement…</span>
+      <button class="icon-btn" onclick="enterPresent()" title="Mode présentation">Présenter</button>
     </div>
   </div>
 
+  <!-- GRID -->
+  <div class="ig-grid" id="igGrid"></div>
 
+  <!-- STATS -->
+  <div class="grid-stats">
+    <div class="grid-counter">
+      <strong id="publishedCount">0</strong> pub · 
+      <strong id="scheduledCount">0</strong> planif · 
+      <strong id="draftCount">0</strong> brouill
+    </div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+
+  <!-- PILLAR FILTER -->
+  <div class="pillar-filter">
+    <button class="pf-btn active" onclick="filterPillar('all',this)">Tous</button>
+    <button class="pf-btn" onclick="filterPillar('transformation',this)"><div class="pf-dot" style="background:#e0607a"></div>Transformation</button>
+    <button class="pf-btn" onclick="filterPillar('expertise',this)"><div class="pf-dot" style="background:#a0506a"></div>Expertise</button>
+    <button class="pf-btn" onclick="filterPillar('confiance',this)"><div class="pf-dot" style="background:#ffabbf"></div>Confiance</button>
+    <button class="pf-btn" onclick="filterPillar('connexion',this)"><div class="pf-dot" style="background:#fde8ee;border:1px solid #ffabbf"></div>Connexion</button>
+  </div>
+
+  <!-- ADD BUTTON -->
+  <button class="add-post-btn" onclick="openAddModal()">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Ajouter un post
+  </button>
+
+  <div class="ig-footer">Ō Ma Biche · Feed Preview — Atelier Léman Digitale</div>
 </div>
 
-<!-- POST DETAIL MODAL -->
+<!-- ── POST MODAL ── -->
 <div class="modal" id="postModal" onclick="handleModalClick(event,'postModal')">
   <div class="modal-card">
     <div id="modalImgArea"></div>
+    <div class="modal-nav">
+      <button class="nav-btn" id="prevBtn" onclick="navigatePost(-1)">‹ Préc.</button>
+      <span id="navCounter" style="font-size:11px;color:#ccc"></span>
+      <button class="nav-btn" id="nextBtn" onclick="navigatePost(1)">Suiv. ›</button>
+    </div>
     <div class="modal-body">
       <div class="modal-header">
-        <button class="modal-close" onclick="closeModal('postModal')" style="margin-left:auto">✕</button>
+        <button class="modal-close" onclick="closeModal('postModal')">✕</button>
       </div>
       <div class="modal-meta" id="modalMeta"></div>
 
       <label class="field-label">Titre</label>
       <input class="field-input" id="editTitle" placeholder="Titre du post..." />
 
-      <label class="field-label">Statut</label>
-      <select class="field-input" id="editStatus">
-        <option value="draft">Brouillon</option>
-        <option value="scheduled">Planifié</option>
-        <option value="published">Publié</option>
-      </select>
+      <div class="field-row">
+        <div>
+          <label class="field-label">Statut</label>
+          <select class="field-input" id="editStatus">
+            <option value="draft">Brouillon</option>
+            <option value="scheduled">Planifié</option>
+            <option value="published">Publié</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Format</label>
+          <select class="field-input" id="editFormat">
+            <option value="Reel">Reel</option>
+            <option value="Carousel">Carousel</option>
+            <option value="Post">Post statique</option>
+          </select>
+        </div>
+      </div>
 
-      <label class="field-label">Caption</label>
-      <textarea class="field-input" id="editCaption" rows="4" placeholder="Texte du post..."></textarea>
+      <div class="caption-wrap">
+        <label class="field-label" style="margin-top:10px">Caption</label>
+        <textarea class="field-input" id="editCaption" rows="4"
+          placeholder="Texte du post..." oninput="updateCaptionCounter()"></textarea>
+        <span class="caption-counter" id="captionCounter">0</span>
+      </div>
+      <div class="caption-hint" id="captionHint"></div>
 
       <label class="field-label">Hashtags</label>
-      <input class="field-input" id="editHashtags" placeholder="#lausanne #microshading..." />
+      <div class="field-with-copy">
+        <input class="field-input" id="editHashtags" placeholder="#lausanne #microshading..." />
+        <button class="copy-btn" id="copyHashtagsBtn" onclick="copyField('editHashtags','copyHashtagsBtn')">Copier</button>
+      </div>
 
       <label class="field-label">Date prévue</label>
       <input class="field-input" id="editDate" placeholder="Ex: 14 avr. 2026" />
     </div>
+
     <div class="url-section">
-      <div class="section-divider">Image</div>
-      <label class="field-label">URL image (Canva, Drive, hébergeur…)</label>
+      <div class="section-divider">Image & Vidéo</div>
+      <label class="field-label">URL Cover / Image (Canva, Drive…)</label>
       <input class="field-input" type="url" id="urlInput" placeholder="https://..." />
-      <button class="apply-btn" onclick="savePost()">Enregistrer les modifications</button>
+      <label class="field-label">URL Vidéo Reel (.mp4, Drive, Dropbox…)</label>
+      <input class="field-input" type="url" id="videoInput" placeholder="https://..." />
+      <button class="apply-btn" onclick="savePost()">Enregistrer — ⌘↵</button>
     </div>
   </div>
 </div>
 
-<!-- ADD POST MODAL -->
+<!-- ── ADD MODAL ── -->
 <div class="modal" id="addModal" onclick="handleModalClick(event,'addModal')">
   <div class="modal-card">
     <div class="modal-body">
       <div class="modal-header">
-        <div class="modal-title">Nouveau post</div>
         <button class="modal-close" onclick="closeModal('addModal')">✕</button>
       </div>
+      <div style="margin-bottom:12px">
+        <p style="font-size:14px;font-weight:600;color:#1a1a1a">Nouveau post</p>
+      </div>
+
       <label class="field-label">Titre *</label>
       <input class="field-input" id="newTitle" placeholder="Ex: Avant/après microshading" />
-      <label class="field-label">URL image (optionnel)</label>
-      <input class="field-input" id="newUrl" placeholder="https://..." />
-      <label class="field-label">Pilier</label>
-      <select class="field-input" id="newPillar">
-        <option value="transformation">Transformation</option>
-        <option value="expertise">Expertise</option>
-        <option value="confiance">Confiance</option>
-        <option value="connexion">Connexion</option>
-      </select>
-      <label class="field-label">Format</label>
-      <select class="field-input" id="newFormat">
-        <option value="Reel">Reel</option>
-        <option value="Carousel">Carousel</option>
-        <option value="Post">Post statique</option>
-      </select>
+
+      <div class="field-row">
+        <div>
+          <label class="field-label">Pilier</label>
+          <select class="field-input" id="newPillar">
+            <option value="transformation">Transformation</option>
+            <option value="expertise">Expertise</option>
+            <option value="confiance">Confiance</option>
+            <option value="connexion">Connexion</option>
+          </select>
+        </div>
+        <div>
+          <label class="field-label">Format</label>
+          <select class="field-input" id="newFormat">
+            <option value="Reel">Reel</option>
+            <option value="Carousel">Carousel</option>
+            <option value="Post">Post statique</option>
+          </select>
+        </div>
+      </div>
+
       <label class="field-label">Statut</label>
       <select class="field-input" id="newStatus">
         <option value="draft">Brouillon</option>
         <option value="scheduled">Planifié</option>
         <option value="published">Publié</option>
       </select>
+
       <label class="field-label">Caption</label>
       <textarea class="field-input" id="newCaption" rows="3" placeholder="Texte du post..."></textarea>
+
       <label class="field-label">Hashtags</label>
       <input class="field-input" id="newHashtags" placeholder="#lausanne #microshading..." />
-      <label class="field-label">Mois</label>
-      <select class="field-input" id="newMonth">
-        <option value="Mois 1 — Avril 2026">Mois 1 — Avril 2026</option>
-        <option value="Mois 2 — Mai 2026">Mois 2 — Mai 2026</option>
-        <option value="Mois 3 — Juin 2026">Mois 3 — Juin 2026</option>
-      </select>
+
       <label class="field-label">Date prévue</label>
-      <input class="field-input" type="date" id="newDate" />
+      <input class="field-input" id="newDate" placeholder="Ex: 14 avr. 2026" />
+
       <button class="apply-btn" onclick="addPost()">Ajouter à la grille</button>
     </div>
   </div>
 </div>
 
 <script>
+/* ── CONSTANTS ── */
+// ⚠️ Remplace cette URL par l'URL de ton Google Apps Script déployé
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9hyrIS0QYuGQGosmNPMMu2d4yRmQYrUNYG6gd7o4SyM1M7N6vg9HWAtBWfrUvAOOa/exec';
+const CAPTION_SOFT = 125;
+const CAPTION_MAX  = 2200;
+
 const PILLAR = {
   transformation: { dot:'pillar-transformation', tag:'pt-transformation', label:'Transformation', color:'#e0607a' },
   expertise:      { dot:'pillar-expertise',      tag:'pt-expertise',      label:'Expertise',      color:'#a0506a' },
@@ -461,179 +557,106 @@ const PILLAR = {
 };
 const STATUS = {
   published: { cls:'status-published', label:'Publié' },
-  scheduled:  { cls:'status-scheduled', label:'Planifié' },
-  draft:      { cls:'status-draft',     label:'Brouillon' }
+  scheduled:  { cls:'status-scheduled',  label:'Planifié' },
+  draft:      { cls:'status-draft',      label:'Brouillon' }
 };
 
-let currentPostId = null;
-
-let posts = [
-  /* ── MOIS 1 — AVRIL 2026 (photos existantes) ── */
-  { id:1,  month:'Mois 1 — Avril 2026', title:'Introduction — Marine & son histoire', url:'', pillar:'connexion', format:'Reel', status:'scheduled', date:'14 avr.',
-    caption:'Je m\'appelle Marine. Voilà ce que je fais depuis 12 ans — et pourquoi je ne fais jamais ce que les autres font.',
-    hashtags:'#lausanne #maquillagesemipermanent #microshading #omabiche #beautelausanne' },
-
-  { id:2,  month:'Mois 1 — Avril 2026', title:'Microshading vs Microblading', url:'', pillar:'expertise', format:'Carousel', status:'scheduled', date:'16 avr.',
-    caption:'Microshading ou microblading : lequel est fait pour vous ? Les différences expliquées en 5 slides.',
-    hashtags:'#microshading #microblading #sourcilsnaturels #beautelausanne #pmulausanne' },
-
-  { id:3,  month:'Mois 1 — Avril 2026', title:'Avant / Après — réconciliation PMU', url:'', pillar:'transformation', format:'Reel', status:'scheduled', date:'18 avr.',
-    caption:'Elle revenait après une mauvaise expérience ailleurs. Voici ce qu\'on a fait. Résultat 3 semaines après.',
-    hashtags:'#avantapres #sourcils #dermopigmentation #lausanne #microshading' },
-
-  { id:4,  month:'Mois 1 — Avril 2026', title:'Ce que personne ne dit sur la durée', url:'', pillar:'expertise', format:'Reel', status:'scheduled', date:'21 avr.',
-    caption:'Ce que personne ne vous dit sur la durée d\'un microshading. 3 facteurs qui changent tout.',
-    hashtags:'#semipermanent #pmulausanne #microshading #sourcils' },
-
-  { id:5,  month:'Mois 1 — Avril 2026', title:'Témoignages — "4 ans de fidélité"', url:'', pillar:'confiance', format:'Carousel', status:'scheduled', date:'23 avr.',
-    caption:'Ce que mes clientes disent après 12 ans. Leurs mots, pas les miens.',
-    hashtags:'#avis #témoignages #maquillagesemipermanent #omabiche #lausanne' },
-
-  { id:6,  month:'Mois 1 — Avril 2026', title:'Rehaussement cils — coulisses', url:'', pillar:'transformation', format:'Reel', status:'scheduled', date:'25 avr.',
-    caption:'Regardez ça. Aucun filtre. Le rehaussement de cils que tout le monde devrait connaître.',
-    hashtags:'#rehaussementcils #cils #lausanne #beautynaturelle #omabiche' },
-
-  { id:7,  month:'Mois 1 — Avril 2026', title:'CHF 250 — le calcul qui change tout', url:'', pillar:'confiance', format:'Reel', status:'scheduled', date:'28 avr.',
-    caption:'CHF 250 pour un microshading. Trop cher ? Faisons le calcul : 34 centimes par matin pendant 2 ans.',
-    hashtags:'#microshading #investissement #beautelausanne #sourcilsnaturels' },
-
-  { id:8,  month:'Mois 1 — Avril 2026', title:'12 ans — ce que j\'ai appris', url:'', pillar:'connexion', format:'Carousel', status:'scheduled', date:'30 avr.',
-    caption:'Ce que 12 ans de maquillage semi-permanent m\'ont appris sur mes clientes. Et sur moi.',
-    hashtags:'#pmu #microshading #lausanne #beauté #artiste' },
-
-  { id:9,  month:'Mois 1 — Avril 2026', title:'Avant / Après — lèvres naturelles', url:'', pillar:'transformation', format:'Reel', status:'scheduled', date:'2 mai',
-    caption:'Des lèvres redessinées. Sans injection. Sans douleur. Voilà le résultat.',
-    hashtags:'#levres #lipliner #beaute #lausanne #semipermanent' },
-
-  { id:10, month:'Mois 1 — Avril 2026', title:'FAQ — vos 3 questions les plus posées', url:'', pillar:'expertise', format:'Reel', status:'scheduled', date:'5 mai',
-    caption:'Est-ce douloureux ? Combien de temps ça dure ? Est-ce que ça fait naturel ? Je réponds.',
-    hashtags:'#faq #microshading #lausanne #maquillagesemipermanent' },
-
-  { id:11, month:'Mois 1 — Avril 2026', title:'La cliente qui m\'a réconciliée', url:'', pillar:'connexion', format:'Reel', status:'scheduled', date:'7 mai',
-    caption:'Il y a une cliente qui m\'a rappelé pourquoi je fais ce métier. Cette semaine, je vous raconte.',
-    hashtags:'#histoireclient #pmu #microshading #beaute #lausanne' },
-
-  { id:12, month:'Mois 1 — Avril 2026', title:'Pour qui est fait le microshading ?', url:'', pillar:'confiance', format:'Carousel', status:'scheduled', date:'9 mai',
-    caption:'Profil type de mes clientes. Vous vous reconnaissez ? Le lien pour réserver est en bio.',
-    hashtags:'#microshading #sourcils #lausanne #clientideal #omabiche' },
-
-  /* ── MOIS 2 — MAI/JUIN 2026 (post-shooting) ── */
-  { id:13, month:'Mois 2 — Mai 2026', title:'Coulisses de la journée de shooting', url:'', pillar:'connexion', format:'Reel', status:'draft', date:'12 mai',
-    caption:'Aujourd\'hui c\'est jour de shooting. Voici les coulisses — et pourquoi chaque photo raconte quelque chose.',
-    hashtags:'#shooting #coulisses #microshading #lausanne #omabiche' },
-
-  { id:14, month:'Mois 2 — Mai 2026', title:'Avant / Après — zoom geste technique', url:'', pillar:'transformation', format:'Reel', status:'draft', date:'14 mai',
-    caption:'Le geste derrière le résultat. 12 ans de précision, filmés pour la première fois.',
-    hashtags:'#technique #pmu #microshading #artiste #lausanne' },
-
-  { id:15, month:'Mois 2 — Mai 2026', title:'Colorimétrie — comment je choisis', url:'', pillar:'expertise', format:'Carousel', status:'draft', date:'16 mai',
-    caption:'Comment je choisis la couleur parfaite selon votre carnation. Une expertise qui se voit — ou plutôt, ne se voit pas.',
-    hashtags:'#colorimetrie #microshading #sourcils #lausanne #beautenaturelle' },
-
-  { id:16, month:'Mois 2 — Mai 2026', title:'Avis Google — verbatim clients', url:'', pillar:'confiance', format:'Post', status:'draft', date:'19 mai',
-    caption:'"LA référence du regard à Lausanne." Ce n\'est pas moi qui le dis.',
-    hashtags:'#avis #google #omabiche #microshading #lausanne' },
-
-  { id:17, month:'Mois 2 — Mai 2026', title:'Mon espace de travail — visite', url:'', pillar:'connexion', format:'Reel', status:'draft', date:'21 mai',
-    caption:'L\'Institut Namasté. L\'endroit où tout se passe. Venez voir.',
-    hashtags:'#institutbeaute #lausanne #microshading #coulisses #omabiche' },
-
-  { id:18, month:'Mois 2 — Mai 2026', title:'3 signes que votre PMU a besoin retouche', url:'', pillar:'expertise', format:'Carousel', status:'draft', date:'23 mai',
-    caption:'3 signes que votre maquillage semi-permanent a besoin d\'une retouche. Reconnaissance et solution.',
-    hashtags:'#retouche #microshading #pmulausanne #sourcils #beaute' },
-
-  { id:19, month:'Mois 2 — Mai 2026', title:'Transformation — cliente 5 ans de fidélité', url:'', pillar:'transformation', format:'Reel', status:'draft', date:'26 mai',
-    caption:'Elle est cliente depuis 5 ans. Voici son évolution — et ce qu\'elle m\'a dit cette semaine.',
-    hashtags:'#fidelite #microshading #avantapres #lausanne #omabiche' },
-
-  { id:20, month:'Mois 2 — Mai 2026', title:'Préparer votre 1er RDV PMU', url:'', pillar:'expertise', format:'Carousel', status:'draft', date:'28 mai',
-    caption:'Tout ce que vous devez savoir avant votre premier rendez-vous maquillage semi-permanent.',
-    hashtags:'#premierfois #microshading #conseils #lausanne #beaute' },
-
-  { id:21, month:'Mois 2 — Mai 2026', title:'Résultats naturels — ma philosophie', url:'', pillar:'connexion', format:'Reel', status:'draft', date:'30 mai',
-    caption:'Ma règle absolue : si ça ne vous ressemble pas, on ne le fait pas. Voilà ma philosophie en 30 secondes.',
-    hashtags:'#philosophie #naturel #microshading #lausanne #pmu' },
-
-  { id:22, month:'Mois 2 — Mai 2026', title:'Taches de rousseur PMU — tendance ?', url:'', pillar:'expertise', format:'Reel', status:'draft', date:'2 juin',
-    caption:'Les taches de rousseur semi-permanentes. Tendance ou classique ? Mon avis d\'experte.',
-    hashtags:'#tachesderousse #microshading #pmu #tendance #lausanne' },
-
-  { id:23, month:'Mois 2 — Mai 2026', title:'Avant / Après — types de peaux', url:'', pillar:'transformation', format:'Carousel', status:'draft', date:'4 juin',
-    caption:'Le même microshading sur 3 types de peaux différentes. Le résultat varie — et c\'est normal.',
-    hashtags:'#peaux #microshading #avantapres #lausanne #omabiche' },
-
-  { id:24, month:'Mois 2 — Mai 2026', title:'La preuve — 3 mois après', url:'', pillar:'confiance', format:'Reel', status:'draft', date:'6 juin',
-    caption:'3 mois après le microshading. Voici où on en est. Toujours là.',
-    hashtags:'#suivi #microshading #lausanne #omabiche #pmu' },
-
-  /* ── MOIS 3 — JUIN 2026 ── */
-  { id:25, month:'Mois 3 — Juin 2026', title:'Bilan 2 mois — ce qui a changé', url:'', pillar:'connexion', format:'Reel', status:'draft', date:'9 juin',
-    caption:'2 mois. 24 posts. Voici ce que j\'ai appris sur moi et sur vous.',
-    hashtags:'#bilan #microshading #lausanne #omabiche #pmu' },
-
-  { id:26, month:'Mois 3 — Juin 2026', title:'L\'été approche — sourcils résistants', url:'', pillar:'expertise', format:'Reel', status:'draft', date:'11 juin',
-    caption:'L\'été arrive. Vos sourcils microshading tiennent-ils au soleil, à la mer, à la piscine ? Réponse.',
-    hashtags:'#ete #microshading #sourcils #lausanne #waterproof' },
-
-  { id:27, month:'Mois 3 — Juin 2026', title:'Promo été — annonce officielle', url:'', pillar:'confiance', format:'Post', status:'draft', date:'13 juin',
-    caption:'L\'offre d\'été de Ō Ma Biche. Places limitées. Lien en bio.',
-    hashtags:'#promo #ete #microshading #lausanne #omabiche' },
-
-  { id:28, month:'Mois 3 — Juin 2026', title:'Avant / Après — lèvres couleur été', url:'', pillar:'transformation', format:'Reel', status:'draft', date:'16 juin',
-    caption:'Une couleur lèvres pour l\'été. Naturelle, lumineuse, sans effort.',
-    hashtags:'#levres #ete #couleur #semipermanent #lausanne' },
-
-  { id:29, month:'Mois 3 — Juin 2026', title:'GMB update — nouvelles photos', url:'', pillar:'confiance', format:'Post', status:'draft', date:'18 juin',
-    caption:'On a mis à jour notre fiche Google. Venez découvrir les nouvelles photos de l\'institut.',
-    hashtags:'#google #lausanne #omabiche #microshading #beaute' },
-
-  { id:30, month:'Mois 3 — Juin 2026', title:'Expertise — corrections anciennes PMU', url:'', pillar:'expertise', format:'Carousel', status:'draft', date:'20 juin',
-    caption:'Corrections de pigmentations malheureuses. C\'est aussi ce que je fais — et c\'est souvent le plus gratifiant.',
-    hashtags:'#correction #microshading #pmu #lausanne #expertise' },
-
-  { id:31, month:'Mois 3 — Juin 2026', title:'Transformation — 1 an de suivi cliente', url:'', pillar:'transformation', format:'Reel', status:'draft', date:'23 juin',
-    caption:'Un an de suivi. Voici l\'évolution complète. C\'est ça, mon travail.',
-    hashtags:'#suivi #microshading #lausanne #omabiche #avantapres' },
-
-  { id:32, month:'Mois 3 — Juin 2026', title:'Invitation — journée portes ouvertes', url:'', pillar:'connexion', format:'Post', status:'draft', date:'25 juin',
-    caption:'Je vous ouvre les portes. Venez découvrir l\'espace, poser vos questions, me rencontrer.',
-    hashtags:'#portesouvertes #lausanne #microshading #omabiche #invitation' },
-
-  { id:33, month:'Mois 3 — Juin 2026', title:'Bilan 3 mois — ce que vous m\'avez appris', url:'', pillar:'connexion', format:'Reel', status:'draft', date:'27 juin',
-    caption:'3 mois de contenu. Voici ce que j\'ai appris — sur Instagram, sur vous, et sur moi.',
-    hashtags:'#bilan #microshading #lausanne #omabiche #pmu' },
-
-  { id:34, month:'Mois 3 — Juin 2026', title:'CTA final — réservez avant l\'été', url:'', pillar:'confiance', format:'Post', status:'draft', date:'30 juin',
-    caption:'Juillet arrive. Les dernières places sont disponibles. Lien en bio.',
-    hashtags:'#juillet #microshading #lausanne #omabiche #reservation' }
+/* ── DEFAULT POSTS (12 — Mois 1 seulement) ── */
+const DEFAULT_POSTS = [
+  { id:1,  title:'Introduction — Marine & son histoire',      url:'', videoUrl:'', pillar:'connexion',      format:'Reel',     status:'scheduled', date:'14 avr.', caption:'Je m\'appelle Marine. Voilà ce que je fais depuis 12 ans — et pourquoi je ne fais jamais ce que les autres font.',                                        hashtags:'#lausanne #maquillagesemipermanent #microshading #omabiche #beautelausanne' },
+  { id:2,  title:'Microshading vs Microblading',              url:'', videoUrl:'', pillar:'expertise',      format:'Carousel', status:'scheduled', date:'16 avr.', caption:'Microshading ou microblading : lequel est fait pour vous ? Les différences expliquées en 5 slides.',                                                     hashtags:'#microshading #microblading #sourcilsnaturels #beautelausanne #pmulausanne' },
+  { id:3,  title:'Avant / Après — réconciliation PMU',        url:'', videoUrl:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'18 avr.', caption:'Elle revenait après une mauvaise expérience ailleurs. Voici ce qu\'on a fait. Résultat 3 semaines après.',                                               hashtags:'#avantapres #sourcils #dermopigmentation #lausanne #microshading' },
+  { id:4,  title:'Ce que personne ne dit sur la durée',       url:'', videoUrl:'', pillar:'expertise',      format:'Reel',     status:'scheduled', date:'21 avr.', caption:'Ce que personne ne vous dit sur la durée d\'un microshading. 3 facteurs qui changent tout.',                                                               hashtags:'#semipermanent #pmulausanne #microshading #sourcils' },
+  { id:5,  title:'Témoignages — "4 ans de fidélité"',         url:'', videoUrl:'', pillar:'confiance',      format:'Carousel', status:'scheduled', date:'23 avr.', caption:'Ce que mes clientes disent après 12 ans. Leurs mots, pas les miens.',                                                                                       hashtags:'#avis #témoignages #maquillagesemipermanent #omabiche #lausanne' },
+  { id:6,  title:'Rehaussement cils — coulisses',             url:'', videoUrl:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'25 avr.', caption:'Regardez ça. Aucun filtre. Le rehaussement de cils que tout le monde devrait connaître.',                                                                   hashtags:'#rehaussementcils #cils #lausanne #beautynaturelle #omabiche' },
+  { id:7,  title:'CHF 250 — le calcul qui change tout',       url:'', videoUrl:'', pillar:'confiance',      format:'Reel',     status:'scheduled', date:'28 avr.', caption:'CHF 250 pour un microshading. Trop cher ? Faisons le calcul : 34 centimes par matin pendant 2 ans.',                                                        hashtags:'#microshading #investissement #beautelausanne #sourcilsnaturels' },
+  { id:8,  title:'12 ans — ce que j\'ai appris',              url:'', videoUrl:'', pillar:'connexion',      format:'Carousel', status:'scheduled', date:'30 avr.', caption:'Ce que 12 ans de maquillage semi-permanent m\'ont appris sur mes clientes. Et sur moi.',                                                                    hashtags:'#pmu #microshading #lausanne #beauté #artiste' },
+  { id:9,  title:'Avant / Après — lèvres naturelles',         url:'', videoUrl:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'2 mai',  caption:'Des lèvres redessinées. Sans injection. Sans douleur. Voilà le résultat.',                                                                                 hashtags:'#levres #lipliner #beaute #lausanne #semipermanent' },
+  { id:10, title:'FAQ — vos 3 questions les plus posées',     url:'', videoUrl:'', pillar:'expertise',      format:'Reel',     status:'scheduled', date:'5 mai',  caption:'Est-ce douloureux ? Combien de temps ça dure ? Est-ce que ça fait naturel ? Je réponds.',                                                                   hashtags:'#faq #microshading #lausanne #maquillagesemipermanent' },
+  { id:11, title:'La cliente qui m\'a réconciliée',           url:'', videoUrl:'', pillar:'connexion',      format:'Reel',     status:'scheduled', date:'7 mai',  caption:'Il y a une cliente qui m\'a rappelé pourquoi je fais ce métier. Cette semaine, je vous raconte.',                                                           hashtags:'#histoireclient #pmu #microshading #beaute #lausanne' },
+  { id:12, title:'Pour qui est fait le microshading ?',       url:'', videoUrl:'', pillar:'confiance',      format:'Carousel', status:'scheduled', date:'9 mai',  caption:'Profil type de mes clientes. Vous vous reconnaissez ? Le lien pour réserver est en bio.',                                                                   hashtags:'#microshading #sourcils #lausanne #clientideal #omabiche' }
 ];
 
+/* ── STATE ── */
+let posts = [];
+let currentPostId = null;
 let activeFilter = 'all';
+let visiblePosts = [];
+let saveTimer = null;
 
-function filterPillar(pillar, btn) {
-  activeFilter = pillar;
-  document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+/* ── PERSISTENCE — Google Sheets ── */
+async function loadPosts() {
+  setSaveIndicator('saving', '● chargement…');
+  try {
+    const res = await fetch(APPS_SCRIPT_URL + '?method=load', { method: 'GET' });
+    const data = await res.json();
+    if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
+      posts = data.posts;
+      setSaveIndicator('saved', '● synchronisé ✓');
+    } else {
+      // Feuille vide → charger les posts par défaut et les sauvegarder
+      posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
+      setSaveIndicator('saving', '● initialisation…');
+      await _pushToSheets();
+    }
+  } catch(e) {
+    // Erreur réseau → fallback sur les posts par défaut
+    posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
+    setSaveIndicator('', '⚠ hors ligne — données locales');
+  }
   renderGrid();
+}
+
+async function savePosts() {
+  setSaveIndicator('saving', '● sauvegarde…');
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    await _pushToSheets();
+  }, 800);
+}
+
+async function _pushToSheets() {
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ posts }),
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    if (data.ok) {
+      setSaveIndicator('saved', '● Google Sheets ✓');
+    } else {
+      setSaveIndicator('', '⚠ erreur : ' + (data.error || '?'));
+    }
+  } catch(e) {
+    setSaveIndicator('', '⚠ erreur réseau');
+  }
+}
+
+function setSaveIndicator(cls, text) {
+  const el = document.getElementById('saveIndicator');
+  el.className = 'save-indicator ' + cls;
+  el.textContent = text;
 }
 
 /* ── RENDER GRID ── */
 function renderGrid() {
   const grid = document.getElementById('igGrid');
   grid.innerHTML = '';
+  visiblePosts = (activeFilter === 'all'
+    ? posts
+    : posts.filter(p => p.pillar === activeFilter)
+  ).slice(0, 12);
 
-  const filtered = activeFilter === 'all' ? posts : posts.filter(p => p.pillar === activeFilter);
-  const visible = filtered.slice(0, 12);
-
-  visible.forEach((post, idx) => {
+  visiblePosts.forEach(post => {
     const cell = document.createElement('div');
     cell.className = 'ig-cell';
-    cell.onclick = () => openPostModal(post.id);
+    const presentMode = document.body.classList.contains('present-mode');
+    if (!presentMode) cell.onclick = () => openPostModal(post.id);
 
     if (post.url) {
       const img = document.createElement('img');
-      img.src = post.url;
-      img.alt = post.title;
+      img.src = post.url; img.alt = post.title;
       img.onerror = () => { img.remove(); cell.insertBefore(makePlaceholder(post), cell.firstChild); };
       cell.appendChild(img);
     } else {
@@ -643,22 +666,24 @@ function renderGrid() {
     const overlay = document.createElement('div');
     overlay.className = 'ig-cell-overlay';
     const s = STATUS[post.status] || STATUS.draft;
-    overlay.innerHTML = `<span class="status-badge ${s.cls}">${s.label}</span>`;
+    if (!presentMode) overlay.innerHTML = `<span class="status-badge ${s.cls}">${s.label}</span>`;
     cell.appendChild(overlay);
 
     const dot = document.createElement('div');
     dot.className = `ig-cell-pillar ${PILLAR[post.pillar]?.dot || ''}`;
     cell.appendChild(dot);
 
-    const fmt = document.createElement('div');
-    fmt.className = 'format-icon';
-    fmt.textContent = post.format === 'Reel' ? '▶' : post.format === 'Carousel' ? '⊞' : '□';
-    cell.appendChild(fmt);
+    if (!presentMode) {
+      const fmt = document.createElement('div');
+      fmt.className = 'format-icon' + (post.format === 'Reel' && post.videoUrl ? ' has-video' : '');
+      fmt.textContent = post.format === 'Reel' ? (post.videoUrl ? '▶' : '▷') : post.format === 'Carousel' ? '⊞' : '□';
+      cell.appendChild(fmt);
 
-    const num = document.createElement('div');
-    num.className = 'ig-cell-num';
-    num.textContent = posts.indexOf(post) + 1;
-    cell.appendChild(num);
+      const num = document.createElement('div');
+      num.className = 'ig-cell-num';
+      num.textContent = posts.indexOf(post) + 1;
+      cell.appendChild(num);
+    }
 
     grid.appendChild(cell);
   });
@@ -667,12 +692,11 @@ function renderGrid() {
 }
 
 function updateStats() {
-  const total = posts.length;
-  const pub = posts.filter(p => p.status === 'published').length;
-  const sch = posts.filter(p => p.status === 'scheduled').length;
-  const dra = posts.filter(p => p.status === 'draft').length;
+  const pub = visiblePosts.filter(p => p.status === 'published').length;
+  const sch = visiblePosts.filter(p => p.status === 'scheduled').length;
+  const dra = visiblePosts.filter(p => p.status === 'draft').length;
+  const total = visiblePosts.length;
   const pct = total > 0 ? Math.round((pub + sch) / total * 100) : 0;
-
   document.getElementById('publishedCount').textContent = pub;
   document.getElementById('scheduledCount').textContent = sch;
   document.getElementById('draftCount').textContent = dra;
@@ -682,72 +706,126 @@ function updateStats() {
 function makePlaceholder(post) {
   const ph = document.createElement('div');
   ph.className = 'ig-cell-placeholder';
-  ph.innerHTML = `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><div class="ig-cell-placeholder-label">${post.format}</div>`;
+  const isReel = post.format === 'Reel';
+  ph.innerHTML = isReel
+    ? `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.5"><polygon points="5,3 19,12 5,21"/></svg><div class="ig-cell-placeholder-label">Reel</div>`
+    : `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><div class="ig-cell-placeholder-label">${post.format}</div>`;
   return ph;
 }
 
-/* ── RENDER MAP ── */
-function renderMap() {
-  const map = document.getElementById('mapView');
-  map.innerHTML = '';
-  let lastMonth = '';
-  posts.forEach((post, i) => {
-    if (post.month !== lastMonth) {
-      const sep = document.createElement('div');
-      sep.className = 'month-sep';
-      sep.textContent = post.month;
-      map.appendChild(sep);
-      lastMonth = post.month;
-    }
-    const p = PILLAR[post.pillar] || PILLAR.connexion;
-    const s = STATUS[post.status] || STATUS.draft;
-    const row = document.createElement('div');
-    row.className = 'map-row';
-    row.innerHTML = `
-      <div class="map-num">${i+1}</div>
-      <div class="map-pillar-bar" style="background:${p.color}"></div>
-      <div class="map-info">
-        <div class="map-title">${post.title}</div>
-        <div class="map-meta">${post.format} · ${post.date || '—'} · <span style="color:${p.color};font-weight:600">${p.label}</span></div>
-      </div>
-      <div class="map-status"><span class="status-badge ${s.cls}">${s.label}</span></div>
-    `;
-    row.onclick = () => openPostModal(post.id);
-    map.appendChild(row);
-  });
+/* ── FILTER ── */
+function filterPillar(pillar, btn) {
+  activeFilter = pillar;
+  document.querySelectorAll('.pf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
 }
 
-/* ── TABS ── */
-function switchTab(tab, el) {
-  document.querySelectorAll('.ig-tab').forEach(t => t.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('gridView').style.display = tab === 'grid' ? 'block' : 'none';
-  const mapView = document.getElementById('mapView');
-  if (tab === 'map') { mapView.classList.add('visible'); renderMap(); }
-  else { mapView.classList.remove('visible'); }
+/* ── CAPTION COUNTER ── */
+function updateCaptionCounter() {
+  const ta = document.getElementById('editCaption');
+  const counter = document.getElementById('captionCounter');
+  const hint = document.getElementById('captionHint');
+  const len = ta.value.length;
+  counter.textContent = len;
+
+  if (len === 0) {
+    counter.className = 'caption-counter';
+    hint.textContent = '';
+    hint.className = 'caption-hint';
+  } else if (len <= CAPTION_SOFT) {
+    counter.className = 'caption-counter ok';
+    hint.textContent = `✓ Visible sans "Voir plus" (${CAPTION_SOFT - len} caract. restants)`;
+    hint.className = 'caption-hint ok';
+  } else if (len <= CAPTION_MAX) {
+    counter.className = 'caption-counter warning';
+    hint.textContent = `⚠ Tronqué après 125 caract. · ${len} / ${CAPTION_MAX}`;
+    hint.className = 'caption-hint warning';
+  } else {
+    counter.className = 'caption-counter over';
+    hint.textContent = `✕ Limite dépassée : ${len - CAPTION_MAX} caract. en trop`;
+    hint.className = 'caption-hint over';
+  }
+}
+
+/* ── COPY FIELD ── */
+function copyField(fieldId, btnId) {
+  const val = document.getElementById(fieldId).value;
+  if (!val) return;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById(btnId);
+    btn.textContent = '✓ Copié';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => showToast('Copie non supportée', '#aaa'));
+}
+
+/* ── PRESENTATION MODE ── */
+function enterPresent() {
+  document.body.classList.add('present-mode');
+  renderGrid();
+}
+function exitPresent() {
+  document.body.classList.remove('present-mode');
+  renderGrid();
 }
 
 /* ── POST MODAL ── */
+function renderModalMedia(post) {
+  const imgArea = document.getElementById('modalImgArea');
+  if (post.videoUrl) {
+    imgArea.innerHTML = `<video class="modal-video" controls playsinline preload="metadata" src="${post.videoUrl}"></video>`;
+  } else if (post.url) {
+    imgArea.innerHTML = `<img class="modal-img" src="${post.url}" alt="${post.title}" />`;
+  } else {
+    const isReel = post.format === 'Reel';
+    imgArea.innerHTML = `<div class="modal-img-placeholder">${isReel
+      ? '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.2"><polygon points="5,3 19,12 5,21"/></svg>'
+      : '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg>'
+    }</div>`;
+  }
+}
+
+function updateNavButtons() {
+  const idx = visiblePosts.findIndex(p => p.id === currentPostId);
+  document.getElementById('prevBtn').disabled = idx <= 0;
+  document.getElementById('nextBtn').disabled = idx >= visiblePosts.length - 1;
+  document.getElementById('navCounter').textContent = visiblePosts.length > 0 ? `${idx + 1} / ${visiblePosts.length}` : '';
+}
+
+function navigatePost(dir) {
+  const idx = visiblePosts.findIndex(p => p.id === currentPostId);
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= visiblePosts.length) return;
+  const video = document.querySelector('.modal-video');
+  if (video) video.pause();
+  openPostModal(visiblePosts[newIdx].id);
+}
+
 function openPostModal(id) {
   currentPostId = id;
   const post = posts.find(p => p.id === id);
   if (!post) return;
 
-  const imgArea = document.getElementById('modalImgArea');
-  imgArea.innerHTML = post.url
-    ? `<img class="modal-img" src="${post.url}" alt="${post.title}" onerror="this.parentElement.innerHTML='<div class=modal-img-placeholder><svg width=48 height=48 viewBox=\\'0 0 24 24\\' fill=none stroke=#ffabbf stroke-width=1.2><rect x=3 y=3 width=18 height=18 rx=3/><circle cx=8.5 cy=8.5 r=1.5/><path d=\\'m21 15-5-5L5 21\\'/></svg></div>'" />`
-    : `<div class="modal-img-placeholder"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg></div>`;
+  renderModalMedia(post);
 
   const p = PILLAR[post.pillar] || PILLAR.connexion;
-  document.getElementById('modalMeta').innerHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>${post.month ? '<span style="font-size:10px;color:#ccc;margin-left:2px">'+post.month+'</span>' : ''}`;
+  document.getElementById('modalMeta').innerHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>`;
 
-  document.getElementById('editTitle').value   = post.title || '';
-  document.getElementById('editStatus').value  = post.status || 'draft';
-  document.getElementById('editCaption').value = post.caption || '';
-  document.getElementById('editHashtags').value= post.hashtags || '';
-  document.getElementById('editDate').value    = post.date || '';
-  document.getElementById('urlInput').value    = post.url || '';
+  document.getElementById('editTitle').value    = post.title || '';
+  document.getElementById('editStatus').value   = post.status || 'draft';
+  document.getElementById('editFormat').value   = post.format || 'Reel';
+  document.getElementById('editCaption').value  = post.caption || '';
+  document.getElementById('editHashtags').value = post.hashtags || '';
+  document.getElementById('editDate').value     = post.date || '';
+  document.getElementById('urlInput').value     = post.url || '';
+  document.getElementById('videoInput').value   = post.videoUrl || '';
 
+  document.getElementById('copyHashtagsBtn').textContent = 'Copier';
+  document.getElementById('copyHashtagsBtn').classList.remove('copied');
+
+  updateCaptionCounter();
+  updateNavButtons();
   openModal('postModal');
   setTimeout(() => document.getElementById('editTitle').focus(), 100);
 }
@@ -756,21 +834,58 @@ function savePost() {
   if (currentPostId === null) return;
   const post = posts.find(p => p.id === currentPostId);
   if (!post) return;
-
   const newTitle = document.getElementById('editTitle').value.trim();
   if (!newTitle) { document.getElementById('editTitle').focus(); showToast('Le titre ne peut pas être vide', '#e0607a'); return; }
 
   post.title    = newTitle;
   post.status   = document.getElementById('editStatus').value;
+  post.format   = document.getElementById('editFormat').value;
   post.caption  = document.getElementById('editCaption').value.trim();
   post.hashtags = document.getElementById('editHashtags').value.trim();
   post.date     = document.getElementById('editDate').value.trim();
   post.url      = document.getElementById('urlInput').value.trim();
+  post.videoUrl = document.getElementById('videoInput').value.trim();
 
+  savePosts();
   renderGrid();
   closeModal('postModal');
-  showToast('✓ Modifications enregistrées');
+  showToast('✓ Enregistré');
 }
+
+/* ── ADD MODAL ── */
+function openAddModal() {
+  ['newTitle','newCaption','newHashtags','newDate'].forEach(id => document.getElementById(id).value = '');
+  openModal('addModal');
+  setTimeout(() => document.getElementById('newTitle').focus(), 100);
+}
+
+function addPost() {
+  const title = document.getElementById('newTitle').value.trim();
+  if (!title) { document.getElementById('newTitle').focus(); return; }
+  const newPost = {
+    id: Date.now(), title,
+    url: '', videoUrl: '',
+    pillar: document.getElementById('newPillar').value,
+    format: document.getElementById('newFormat').value,
+    status: document.getElementById('newStatus').value,
+    date:   document.getElementById('newDate').value.trim(),
+    caption: document.getElementById('newCaption').value.trim(),
+    hashtags: document.getElementById('newHashtags').value.trim()
+  };
+  posts.push(newPost);
+  savePosts();
+  renderGrid();
+  closeModal('addModal');
+  showToast('✓ Post ajouté');
+}
+
+/* ── HELPERS ── */
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) {
+  const v = document.querySelector('.modal-video'); if (v) v.pause();
+  document.getElementById(id).classList.remove('open');
+}
+function handleModalClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 
 function showToast(msg, color) {
   const t = document.createElement('div');
@@ -780,44 +895,19 @@ function showToast(msg, color) {
   setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 400); }, 2000);
 }
 
-/* ── ADD MODAL ── */
-function openAddModal() {
-  ['newTitle','newUrl','newCaption','newHashtags'].forEach(id => document.getElementById(id).value = '');
-  document.getElementById('newDate').value = '';
-  openModal('addModal');
-}
-
-function addPost() {
-  const title = document.getElementById('newTitle').value.trim();
-  if (!title) { document.getElementById('newTitle').focus(); return; }
-  posts.unshift({
-    id: Date.now(),
-    month: document.getElementById('newMonth').value,
-    title,
-    url: document.getElementById('newUrl').value.trim(),
-    pillar: document.getElementById('newPillar').value,
-    format: document.getElementById('newFormat').value,
-    status: document.getElementById('newStatus').value,
-    date: document.getElementById('newDate').value,
-    caption: document.getElementById('newCaption').value.trim(),
-    hashtags: document.getElementById('newHashtags').value.trim()
-  });
-  renderGrid();
-  closeModal('addModal');
-}
-
-/* ── HELPERS ── */
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-function handleModalClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
-
-/* ── KEYBOARD SHORTCUTS ── */
+/* ── KEYBOARD ── */
 document.addEventListener('keydown', e => {
+  const postOpen = document.getElementById('postModal').classList.contains('open');
+  const inInput = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
   if (e.key === 'Escape') { closeModal('postModal'); closeModal('addModal'); }
-  if (e.key === 'Enter' && e.metaKey && document.getElementById('postModal').classList.contains('open')) savePost();
+  if (e.key === 'Enter' && e.metaKey && postOpen) { e.preventDefault(); savePost(); }
+  if (e.key === 'ArrowLeft'  && postOpen && !inInput) navigatePost(-1);
+  if (e.key === 'ArrowRight' && postOpen && !inInput) navigatePost(1);
 });
 
-renderGrid();
+/* ── INIT ── */
+// loadPosts() appelle renderGrid() en interne une fois les données chargées
+loadPosts();
 </script>
 </body>
 </html>
