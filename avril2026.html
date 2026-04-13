@@ -381,7 +381,7 @@ body.present-mode .present-bar { display: flex; }
 
   <!-- TOP BAR -->
   <div class="top-bar">
-    <span class="top-bar-title">Ō Ma Biche · Feed Avril 2026 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
+    <span class="top-bar-title">Ō Ma Biche · Feed Mois 1 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
     <div class="top-bar-right">
       <span class="save-indicator" id="saveIndicator">● chargement…</span>
       <button class="icon-btn" onclick="enterPresent()" title="Mode présentation">Présenter</button>
@@ -586,74 +586,126 @@ let visiblePosts = [];
 let saveTimer = null;
 
 /* ── PERSISTENCE — Google Sheets ── */
-async function loadPosts() {
-  setSaveIndicator('saving', '● chargement…');
-  try {
-    // Apps Script redirige — il faut suivre le redirect manuellement
-    const res = await fetch(APPS_SCRIPT_URL + '?method=load', {
-      redirect: 'follow',
-      mode: 'cors'
-    });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
-      posts = data.posts;
-      setSaveIndicator('saved', '● Google Sheets ✓');
-    } else {
-      posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
-      setSaveIndicator('saving', '● initialisation…');
-      await _pushToSheets();
-    }
-  } catch(e) {
-    console.warn('loadPosts error:', e);
-    // Fallback localStorage
+/* ── CLEAN POST — nettoie les données venant de Google Sheets ── */
+function cleanPost(post) {
+  const KNOWN_KEYS = ['id','title','pillar','format','status','date','caption','hashtags','url','videoUrl'];
+  const clean = {};
+
+  // Garde uniquement les clés connues
+  KNOWN_KEYS.forEach(k => {
+    clean[k] = post[k] !== undefined ? post[k] : '';
+  });
+
+  // Convertit l'id en number
+  if (clean.id && !isNaN(clean.id)) clean.id = Number(clean.id);
+
+  // Nettoie les dates au format JS long (ex: "Tue Apr 14 2026 02:00:00 GMT+...")
+  // → extrait uniquement "14 avr. 2026" ou conserve si déjà court
+  if (clean.date && clean.date.length > 20) {
     try {
-      const saved = localStorage.getItem('omabiche_posts_backup');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          posts = parsed;
-          setSaveIndicator('', '⚠ Sheets inaccessible — cache local');
-          renderGrid();
-          return;
-        }
+      const d = new Date(clean.date);
+      if (!isNaN(d)) {
+        clean.date = d.toLocaleDateString('fr-CH', {
+          day: 'numeric', month: 'short', year: 'numeric',
+          timeZone: 'Europe/Zurich'
+        });
       }
-    } catch(e2) {}
-    posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
-    setSaveIndicator('', '⚠ Sheets inaccessible — données locales');
+    } catch(e) {}
   }
-  renderGrid();
+
+  return clean;
 }
 
-async function savePosts() {
-  // Sauvegarde locale immédiate (backup)
+/* ── JSONP helper — contourne CORS complètement ── */
+function jsonpFetch(url) {
+  return new Promise((resolve, reject) => {
+    const cbName = '__cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
+    const script = document.createElement('script');
+    const timeout = setTimeout(() => {
+      cleanup();
+      reject(new Error('JSONP timeout'));
+    }, 12000);
+
+    function cleanup() {
+      clearTimeout(timeout);
+      delete window[cbName];
+      if (script.parentNode) script.parentNode.removeChild(script);
+    }
+
+    window[cbName] = function(data) {
+      cleanup();
+      resolve(data);
+    };
+
+    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
+    script.onerror = () => { cleanup(); reject(new Error('JSONP script error')); };
+    document.head.appendChild(script);
+  });
+}
+
+function loadPosts() {
+  setSaveIndicator('saving', '● chargement…');
+
+  // Essai JSONP (contourne CORS)
+  jsonpFetch(APPS_SCRIPT_URL + '?method=load')
+    .then(data => {
+      if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
+        posts = data.posts.map(cleanPost);
+        setSaveIndicator('saved', '● Google Sheets ✓');
+        renderGrid();
+      } else {
+        // Sheet vide → charger défauts et sauvegarder
+        posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
+        setSaveIndicator('saving', '● initialisation…');
+        renderGrid();
+        _pushToSheets();
+      }
+    })
+    .catch(err => {
+      console.warn('loadPosts JSONP error:', err);
+      // Fallback localStorage
+      try {
+        const saved = localStorage.getItem('omabiche_posts_backup');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            posts = parsed;
+            setSaveIndicator('', '⚠ Sheets off — cache local');
+            renderGrid();
+            return;
+          }
+        }
+      } catch(e2) {}
+      posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
+      setSaveIndicator('', '⚠ Sheets off — données locales');
+      renderGrid();
+    });
+}
+
+function savePosts() {
+  // Backup local immédiat
   try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
   setSaveIndicator('saving', '● sauvegarde…');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(async () => {
-    await _pushToSheets();
-  }, 800);
+  saveTimer = setTimeout(() => { _pushToSheets(); }, 800);
 }
 
-async function _pushToSheets() {
-  try {
-    const encoded = encodeURIComponent(JSON.stringify({ posts }));
-    const url = APPS_SCRIPT_URL + '?method=save&data=' + encoded;
-    const res = await fetch(url, { redirect: 'follow', mode: 'cors' });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-    if (data.ok) {
-      setSaveIndicator('saved', '● Google Sheets ✓');
-      // Backup local aussi
-      try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
-    } else {
-      setSaveIndicator('', '⚠ erreur Sheets : ' + (data.error || '?'));
-      console.warn('Sheets error:', data.error);
-    }
-  } catch(e) {
-    setSaveIndicator('', '⚠ Sheets inaccessible — sauvé en local');
-    console.warn('_pushToSheets error:', e);
-  }
+function _pushToSheets() {
+  const encoded = encodeURIComponent(JSON.stringify({ posts }));
+  jsonpFetch(APPS_SCRIPT_URL + '?method=save&data=' + encoded)
+    .then(data => {
+      if (data.ok) {
+        setSaveIndicator('saved', '● Google Sheets ✓');
+        try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
+      } else {
+        setSaveIndicator('', '⚠ Sheets : ' + (data.error || '?'));
+        console.warn('Sheets save error:', data.error);
+      }
+    })
+    .catch(err => {
+      setSaveIndicator('', '⚠ sauvé en local seulement');
+      console.warn('_pushToSheets error:', err);
+    });
 }
 
 function setSaveIndicator(cls, text) {
@@ -984,7 +1036,7 @@ document.addEventListener('keydown', e => {
 });
 
 /* ── INIT ── */
-// loadPosts() appelle renderGrid() en interne une fois les données chargées
+// loadPosts() appelle renderGrid() via JSONP callback
 loadPosts();
 </script>
 </body>
