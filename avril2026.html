@@ -691,16 +691,34 @@ function savePosts() {
 }
 
 function _pushToSheets() {
-  const encoded = encodeURIComponent(JSON.stringify({ posts }));
-  jsonpFetch(APPS_SCRIPT_URL + '?method=save&data=' + encoded)
-    .then(data => {
-      if (data.ok) {
-        setSaveIndicator('saved', '● Google Sheets ✓');
-        try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
-      } else {
-        setSaveIndicator('', '⚠ Sheets : ' + (data.error || '?'));
-        console.warn('Sheets save error:', data.error);
-      }
+  // Envoie les posts en plusieurs petits chunks pour éviter la limite de longueur d'URL GET
+  const CHUNK = 3;
+  const chunks = [];
+  for (let i = 0; i < posts.length; i += CHUNK) {
+    chunks.push(posts.slice(i, i + CHUNK));
+  }
+
+  // Construit la liste d'appels JSONP séquentiels
+  // On envoie d'abord un "clear", puis chaque chunk avec "append"
+  function sendClear() {
+    return jsonpFetch(APPS_SCRIPT_URL + '?method=clear');
+  }
+
+  function sendChunk(chunk) {
+    const encoded = encodeURIComponent(JSON.stringify({ posts: chunk }));
+    return jsonpFetch(APPS_SCRIPT_URL + '?method=append&data=' + encoded);
+  }
+
+  sendClear()
+    .then(() => {
+      // Envoyer les chunks séquentiellement via reduce
+      return chunks.reduce((promise, chunk) => {
+        return promise.then(() => sendChunk(chunk));
+      }, Promise.resolve());
+    })
+    .then(() => {
+      setSaveIndicator('saved', '● Google Sheets ✓');
+      try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
     })
     .catch(err => {
       setSaveIndicator('', '⚠ sauvé en local seulement');
