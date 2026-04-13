@@ -381,7 +381,7 @@ body.present-mode .present-bar { display: flex; }
 
   <!-- TOP BAR -->
   <div class="top-bar">
-    <span class="top-bar-title">Ō Ma Biche · Feed Avril 2026 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
+    <span class="top-bar-title">Ō Ma Biche · Feed Mois 1 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
     <div class="top-bar-right">
       <span class="save-indicator" id="saveIndicator">● chargement…</span>
       <button class="icon-btn" onclick="enterPresent()" title="Mode présentation">Présenter</button>
@@ -589,8 +589,12 @@ let saveTimer = null;
 async function loadPosts() {
   setSaveIndicator('saving', '● chargement…');
   try {
-    // GET only — contourne le CORS (pas de preflight OPTIONS)
-    const res = await fetch(APPS_SCRIPT_URL + '?method=load');
+    // Apps Script redirige — il faut suivre le redirect manuellement
+    const res = await fetch(APPS_SCRIPT_URL + '?method=load', {
+      redirect: 'follow',
+      mode: 'cors'
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
       posts = data.posts;
@@ -601,14 +605,29 @@ async function loadPosts() {
       await _pushToSheets();
     }
   } catch(e) {
-    posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
-    setSaveIndicator('', '⚠ hors ligne — données locales');
     console.warn('loadPosts error:', e);
+    // Fallback localStorage
+    try {
+      const saved = localStorage.getItem('omabiche_posts_backup');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          posts = parsed;
+          setSaveIndicator('', '⚠ Sheets inaccessible — cache local');
+          renderGrid();
+          return;
+        }
+      }
+    } catch(e2) {}
+    posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
+    setSaveIndicator('', '⚠ Sheets inaccessible — données locales');
   }
   renderGrid();
 }
 
 async function savePosts() {
+  // Sauvegarde locale immédiate (backup)
+  try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
   setSaveIndicator('saving', '● sauvegarde…');
   clearTimeout(saveTimer);
   saveTimer = setTimeout(async () => {
@@ -618,19 +637,21 @@ async function savePosts() {
 
 async function _pushToSheets() {
   try {
-    // Encode les données en GET pour éviter le CORS preflight
     const encoded = encodeURIComponent(JSON.stringify({ posts }));
     const url = APPS_SCRIPT_URL + '?method=save&data=' + encoded;
-    const res = await fetch(url);
+    const res = await fetch(url, { redirect: 'follow', mode: 'cors' });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
     if (data.ok) {
       setSaveIndicator('saved', '● Google Sheets ✓');
+      // Backup local aussi
+      try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
     } else {
-      setSaveIndicator('', '⚠ erreur : ' + (data.error || '?'));
+      setSaveIndicator('', '⚠ erreur Sheets : ' + (data.error || '?'));
       console.warn('Sheets error:', data.error);
     }
   } catch(e) {
-    setSaveIndicator('', '⚠ erreur réseau');
+    setSaveIndicator('', '⚠ Sheets inaccessible — sauvé en local');
     console.warn('_pushToSheets error:', e);
   }
 }
