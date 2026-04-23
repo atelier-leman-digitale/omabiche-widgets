@@ -3,375 +3,222 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Ō Ma Biche — Feed Preview</title>
+<title>Ō Ma Biche — Feed Preview v5</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
-  background: #fff5f7;
-  min-height: 100vh;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 20px 16px 40px;
-}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,'Helvetica Neue',Arial,sans-serif;background:#fff5f7;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:20px 16px 40px}
 
 /* ── WRAPPER ── */
-.ig-wrapper {
-  width: 100%; max-width: 480px;
-  background: #fff;
-  border: 0.5px solid #f5c8d4;
-  border-radius: 16px;
-  overflow: hidden;
-}
+.ig-wrapper{width:100%;max-width:935px;background:#fff;border:0.5px solid #f5c8d4;border-radius:16px;overflow:hidden}
+
+/* ── CLIENT MODE BANNER ── */
+.client-banner{display:none;padding:10px 16px;background:#3b0510;align-items:center;gap:10px}
+body.client-mode .client-banner{display:flex}
+.client-banner-text{font-size:12px;color:#ffabbf;font-weight:600;letter-spacing:0.3px;flex:1}
+.client-mode-badge{font-size:10px;background:rgba(255,171,191,0.2);color:#ffabbf;border:0.5px solid rgba(255,171,191,0.4);border-radius:20px;padding:3px 10px;font-weight:600}
 
 /* ── TOP BAR ── */
-.top-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px;
-  border-bottom: 0.5px solid #fde8ee;
-  background: #fff;
-}
-.top-bar-title {
-  font-size: 13px; font-weight: 600; color: #1a1a1a; letter-spacing: 0.2px;
-}
-.top-bar-right { display: flex; gap: 6px; align-items: center; }
-
-.icon-btn {
-  font-size: 11px; font-weight: 600; color: #e0607a;
-  border: 0.5px solid #fde8ee; background: transparent;
-  cursor: pointer; padding: 4px 10px; border-radius: 20px;
-  font-family: inherit; transition: all 0.15s; white-space: nowrap;
-}
-.icon-btn:hover { background: #fde8ee; }
-.icon-btn.active { background: #ffabbf; color: #fff; border-color: #ffabbf; }
-
-.save-indicator {
-  font-size: 10px; color: #bbb; letter-spacing: 0.2px;
-  transition: color 0.3s;
-}
-.save-indicator.saved { color: #4caf82; }
-.save-indicator.saving { color: #ffabbf; }
+.top-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:0.5px solid #fde8ee;background:#fff}
+.top-bar-title{font-size:13px;font-weight:600;color:#1a1a1a;letter-spacing:0.2px}
+.top-bar-right{display:flex;gap:6px;align-items:center}
+.icon-btn{font-size:11px;font-weight:600;color:#e0607a;border:0.5px solid #fde8ee;background:transparent;cursor:pointer;padding:4px 10px;border-radius:20px;font-family:inherit;transition:all 0.15s;white-space:nowrap}
+.icon-btn:hover{background:#fde8ee}
+.save-indicator{font-size:10px;color:#bbb;letter-spacing:0.2px;transition:color 0.3s}
+.save-indicator.saved{color:#4caf82}
+.save-indicator.saving{color:#ffabbf}
+body.client-mode .top-bar-admin-only{display:none}
 
 /* ── GRID ── */
-.ig-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 2px;
-  background: #fde8ee;
-  width: 100%;
-}
+.ig-grid{display:grid;grid-template-columns:repeat(3,293px);gap:3px;background:#efefef;justify-content:center}
+.ig-cell{width:293px;height:293px;position:relative;background:#fce0e8;cursor:pointer;overflow:hidden}
+.ig-cell img{width:100%;height:100%;object-fit:cover;display:block;transition:transform 0.25s}
+.ig-cell:hover img{transform:scale(1.04)}
+.ig-cell-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:#fff0f3;transition:background 0.2s}
+.ig-cell:hover .ig-cell-placeholder{background:#fde8ee}
+.ig-cell-placeholder svg{opacity:0.3}
+.ig-cell-placeholder-label{font-size:9px;color:#d4a0ac;text-align:center;padding:0 8px;line-height:1.3;font-weight:500}
+.ig-cell-overlay{position:absolute;inset:0;background:rgba(224,96,122,0);display:flex;align-items:flex-start;justify-content:flex-end;padding:6px;transition:background 0.2s}
+.ig-cell:hover .ig-cell-overlay{background:rgba(224,96,122,0.12)}
 
-.ig-cell {
-  aspect-ratio: 1;
-  position: relative;
-  background: #fce0e8;
-  cursor: pointer;
-  overflow: hidden;
-}
-.ig-cell img {
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
-  transition: transform 0.25s;
-}
-.ig-cell:hover img { transform: scale(1.04); }
+/* status badges */
+.status-badge{font-size:9px;font-weight:600;padding:2px 6px;border-radius:20px;letter-spacing:0.4px;text-transform:uppercase}
+.status-published{background:#d4f0e4;color:#1a6b40}
+.status-scheduled{background:#fff3cd;color:#7a5000}
+.status-draft{background:#fde8ee;color:#c05070}
 
-.ig-cell-placeholder {
-  width: 100%; height: 100%;
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 6px; background: #fff0f3;
-  transition: background 0.2s;
-}
-.ig-cell:hover .ig-cell-placeholder { background: #fde8ee; }
-.ig-cell-placeholder svg { opacity: 0.3; }
-.ig-cell-placeholder-label {
-  font-size: 9px; color: #d4a0ac; text-align: center;
-  padding: 0 8px; line-height: 1.3; font-weight: 500;
-}
+/* approval badge overlay (top-left in grid) */
+.approval-cell-badge{position:absolute;top:6px;left:6px;font-size:10px;line-height:1;padding:2px 5px;border-radius:4px;background:rgba(255,255,255,0.9);font-weight:700}
+.ap-badge-approved{color:#1a6b40}
+.ap-badge-revision{color:#c05070}
+.ap-badge-pending{color:#7a5000}
 
-.ig-cell-overlay {
-  position: absolute; inset: 0;
-  background: rgba(224,96,122,0);
-  display: flex; align-items: flex-start; justify-content: flex-end;
-  padding: 6px; transition: background 0.2s;
-}
-.ig-cell:hover .ig-cell-overlay { background: rgba(224,96,122,0.12); }
-
-.status-badge {
-  font-size: 9px; font-weight: 600; padding: 2px 6px;
-  border-radius: 20px; letter-spacing: 0.4px; text-transform: uppercase;
-}
-.status-published { background: #d4f0e4; color: #1a6b40; }
-.status-scheduled  { background: #fff3cd; color: #7a5000; }
-.status-draft      { background: #fde8ee; color: #c05070; }
-
-.ig-cell-pillar {
-  position: absolute; bottom: 6px; left: 6px;
-  width: 7px; height: 7px; border-radius: 50%;
-  border: 1.5px solid rgba(255,255,255,0.8);
-}
-.pillar-transformation { background: #e0607a; }
-.pillar-expertise      { background: #a0506a; }
-.pillar-confiance      { background: #ffabbf; }
-.pillar-connexion      { background: #fff0f3; border: 1.5px solid #ffabbf; }
-
-.format-icon {
-  position: absolute; bottom: 6px; right: 6px;
-  font-size: 9px; font-weight: 700; padding: 2px 5px; border-radius: 4px;
-  background: rgba(255,255,255,0.85); color: #c05070; letter-spacing: 0.3px;
-}
-.format-icon.has-video { background: rgba(224,96,122,0.9); color: #fff; }
-
-.ig-cell-num {
-  position: absolute; top: 6px; left: 6px;
-  font-size: 10px; font-weight: 700; color: #fff;
-  background: rgba(0,0,0,0.38);
-  width: 20px; height: 20px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity 0.2s;
-}
-.ig-cell:hover .ig-cell-num { opacity: 1; }
+.ig-cell-pillar{position:absolute;bottom:6px;left:6px;width:7px;height:7px;border-radius:50%;border:1.5px solid rgba(255,255,255,0.8)}
+.pillar-transformation{background:#e0607a}
+.pillar-expertise{background:#a0506a}
+.pillar-confiance{background:#ffabbf}
+.pillar-connexion{background:#fff0f3;border:1.5px solid #ffabbf}
+.format-icon{position:absolute;bottom:6px;right:6px;font-size:9px;font-weight:700;padding:2px 5px;border-radius:4px;background:rgba(255,255,255,0.85);color:#c05070;letter-spacing:0.3px}
+.format-icon.has-video{background:rgba(224,96,122,0.9);color:#fff}
+.ig-cell-num{position:absolute;top:6px;right:6px;font-size:10px;font-weight:700;color:#fff;background:rgba(0,0,0,0.38);width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.2s}
+.ig-cell:hover .ig-cell-num{opacity:1}
 
 /* ── STATS BAR ── */
-.grid-stats {
-  padding: 10px 14px 6px;
-  display: flex; align-items: center; gap: 10px;
-  border-top: 0.5px solid #fde8ee;
-}
-.grid-counter { font-size: 11px; color: #ccc; white-space: nowrap; }
-.grid-counter strong { color: #e0607a; font-weight: 600; }
-.progress-bar-wrap { flex: 1; height: 3px; background: #fde8ee; border-radius: 3px; overflow: hidden; }
-.progress-bar-fill { height: 100%; background: linear-gradient(90deg,#ffabbf,#e0607a); border-radius: 3px; transition: width 0.4s ease; }
+.grid-stats{padding:10px 14px 6px;display:flex;align-items:center;gap:10px;border-top:0.5px solid #fde8ee}
+.grid-counter{font-size:11px;color:#ccc;white-space:nowrap}
+.grid-counter strong{color:#e0607a;font-weight:600}
+.progress-bar-wrap{flex:1;height:3px;background:#fde8ee;border-radius:3px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,#ffabbf,#e0607a);border-radius:3px;transition:width 0.4s ease}
 
 /* ── PILLAR FILTER ── */
-.pillar-filter {
-  padding: 0 14px 10px;
-  display: flex; flex-wrap: wrap; gap: 6px;
-}
-.pf-btn {
-  display: flex; align-items: center; gap: 4px;
-  font-size: 10px; color: #bbb; cursor: pointer;
-  padding: 3px 9px; border-radius: 20px;
-  border: 0.5px solid #fde8ee; background: transparent;
-  font-family: inherit; transition: all 0.15s;
-}
-.pf-btn:hover { background: #fff5f7; color: #e0607a; border-color: #ffabbf; }
-.pf-btn.active { background: #fde8ee; color: #c05070; border-color: #ffabbf; font-weight: 600; }
-.pf-dot { width: 7px; height: 7px; border-radius: 50%; }
+.pillar-filter{padding:0 14px 10px;display:flex;flex-wrap:wrap;gap:6px}
+.pf-btn{display:flex;align-items:center;gap:4px;font-size:10px;color:#bbb;cursor:pointer;padding:3px 9px;border-radius:20px;border:0.5px solid #fde8ee;background:transparent;font-family:inherit;transition:all 0.15s}
+.pf-btn:hover{background:#fff5f7;color:#e0607a;border-color:#ffabbf}
+.pf-btn.active{background:#fde8ee;color:#c05070;border-color:#ffabbf;font-weight:600}
+.pf-dot{width:7px;height:7px;border-radius:50%}
 
-/* ── ADD BUTTON ── */
-.add-post-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px;
-  margin: 10px 14px; padding: 9px;
-  border: 1px dashed #ffabbf; border-radius: 8px;
-  font-size: 12px; color: #e0607a; cursor: pointer;
-  background: transparent; width: calc(100% - 28px);
-  font-family: inherit; transition: background 0.2s;
-}
-.add-post-btn:hover { background: #fff5f7; }
+/* ── ADD / FOOTER ── */
+.add-post-btn{display:flex;align-items:center;justify-content:center;gap:8px;margin:10px 14px;padding:9px;border:1px dashed #ffabbf;border-radius:8px;font-size:12px;color:#e0607a;cursor:pointer;background:transparent;width:calc(100% - 28px);font-family:inherit;transition:background 0.2s}
+.add-post-btn:hover{background:#fff5f7}
+.ig-footer{padding:8px 14px;border-top:0.5px solid #fde8ee;font-size:10px;color:#ddd;text-align:center;letter-spacing:0.3px}
 
-/* ── FOOTER ── */
-.ig-footer {
-  padding: 8px 14px; border-top: 0.5px solid #fde8ee;
-  font-size: 10px; color: #ddd; text-align: center; letter-spacing: 0.3px;
-}
-
-/* ── MODAL OVERLAY ── */
-.modal {
-  display: none; position: fixed; inset: 0;
-  background: rgba(0,0,0,0.6); z-index: 200;
-  align-items: center; justify-content: center; padding: 20px;
-}
-.modal.open { display: flex; }
-.modal-card {
-  background: #fff; border-radius: 14px;
-  width: 100%; max-width: 360px; max-height: 92vh;
-  overflow-y: auto; border: 0.5px solid #fde8ee;
-}
+/* ── MODAL ── */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal.open{display:flex}
+.modal-card{background:#fff;border-radius:14px;width:100%;max-width:420px;max-height:93vh;overflow-y:auto;border:0.5px solid #fde8ee;scrollbar-width:thin}
 
 /* ── MODAL MEDIA ── */
-.modal-img {
-  width: 100%; aspect-ratio: 1; object-fit: cover;
-  background: #fde8ee; border-radius: 14px 14px 0 0; display: block;
-}
-.modal-img-placeholder {
-  width: 100%; aspect-ratio: 1; background: #fff0f3;
-  border-radius: 14px 14px 0 0;
-  display: flex; align-items: center; justify-content: center;
-}
-.modal-video {
-  width: 100%; aspect-ratio: 9/16; max-height: 360px;
-  object-fit: contain; background: #111;
-  border-radius: 14px 14px 0 0; display: block;
-}
+.modal-img{width:100%;aspect-ratio:1;object-fit:cover;background:#fde8ee;border-radius:14px 14px 0 0;display:block}
+.modal-img-placeholder{width:100%;aspect-ratio:1;background:#fff0f3;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center}
+.modal-video{width:100%;aspect-ratio:9/16;max-height:380px;object-fit:contain;background:#111;border-radius:14px 14px 0 0;display:block}
+
+/* ── CAROUSEL ── */
+.carousel-wrap{position:relative;border-radius:14px 14px 0 0;overflow:hidden;background:#000;aspect-ratio:1}
+.carousel-slides{display:flex;width:100%;height:100%;transition:transform 0.35s ease}
+.carousel-slide{min-width:100%;height:100%;flex-shrink:0}
+.carousel-slide img{width:100%;height:100%;object-fit:cover;display:block}
+.carousel-slide .slide-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#fff0f3;flex-direction:column;gap:8px;color:#d4a0ac;font-size:12px}
+.carousel-nav{position:absolute;top:50%;transform:translateY(-50%);display:flex;align-items:center;justify-content:center;width:32px;height:32px;background:rgba(255,255,255,0.85);border:none;border-radius:50%;cursor:pointer;font-size:14px;font-weight:700;color:#333;z-index:2;transition:background 0.15s;line-height:1}
+.carousel-nav:hover{background:#fff}
+.carousel-nav.prev{left:8px}
+.carousel-nav.next{right:8px}
+.carousel-nav:disabled{opacity:0.3;cursor:default}
+.carousel-dots{position:absolute;bottom:8px;left:0;right:0;display:flex;align-items:center;justify-content:center;gap:5px}
+.carousel-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.5);border:none;padding:0;cursor:pointer;transition:background 0.2s}
+.carousel-dot.active{background:#fff}
+
+/* ── CAPTION DISPLAY (sous le media) ── */
+.modal-caption-area{padding:12px 16px;border-bottom:0.5px solid #fde8ee;max-height:200px;overflow-y:auto;scrollbar-width:thin}
+.modal-caption-text{font-size:14px;line-height:1.6;color:#1a1a1a;white-space:pre-wrap;word-break:break-word}
+.modal-hashtags-text{font-size:13px;color:#8e8e8e;margin-top:6px;line-height:1.5;word-break:break-word}
+.modal-caption-area:empty{display:none}
+.caption-empty-hint{font-size:12px;color:#ddd;font-style:italic}
 
 /* ── MODAL NAV ── */
-.modal-nav {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 10px 14px; border-bottom: 0.5px solid #fde8ee;
-}
-.nav-btn {
-  font-size: 11px; font-weight: 600; color: #e0607a;
-  border: none; background: none; cursor: pointer;
-  padding: 4px 8px; border-radius: 6px; font-family: inherit;
-  transition: background 0.15s;
-}
-.nav-btn:hover:not(:disabled) { background: #fde8ee; }
-.nav-btn:disabled { color: #ddd; cursor: default; }
+.modal-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:0.5px solid #fde8ee}
+.nav-btn{font-size:11px;font-weight:600;color:#e0607a;border:none;background:none;cursor:pointer;padding:4px 8px;border-radius:6px;font-family:inherit;transition:background 0.15s}
+.nav-btn:hover:not(:disabled){background:#fde8ee}
+.nav-btn:disabled{color:#ddd;cursor:default}
 
 /* ── MODAL BODY ── */
-.modal-body { padding: 14px; }
-.modal-header {
-  display: flex; align-items: center;
-  justify-content: flex-end; margin-bottom: 8px;
-}
-.modal-close {
-  width: 28px; height: 28px; border: none;
-  background: #fde8ee; border-radius: 50%;
-  cursor: pointer; font-size: 14px; color: #c05070;
-  display: flex; align-items: center; justify-content: center;
-}
-.modal-meta { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
-
-.pillar-tag {
-  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 20px;
-  text-transform: uppercase; letter-spacing: 0.4px;
-}
-.pt-transformation { background: #fde8ee; color: #c04060; }
-.pt-expertise      { background: #f5edf0; color: #804050; }
-.pt-confiance      { background: #fff0f3; color: #b06070; }
-.pt-connexion      { background: #faf8f5; color: #a08080; border: 1px solid #fde8ee; }
-.format-tag {
-  font-size: 10px; padding: 2px 8px; border-radius: 20px;
-  background: #fff3cd; color: #7a5000; font-weight: 600;
-  text-transform: uppercase; letter-spacing: 0.4px;
-}
+.modal-body{padding:14px}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.modal-close{width:28px;height:28px;border:none;background:#fde8ee;border-radius:50%;cursor:pointer;font-size:14px;color:#c05070;display:flex;align-items:center;justify-content:center}
+.modal-meta{display:flex;gap:6px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+.pillar-tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:0.4px}
+.pt-transformation{background:#fde8ee;color:#c04060}
+.pt-expertise{background:#f5edf0;color:#804050}
+.pt-confiance{background:#fff0f3;color:#b06070}
+.pt-connexion{background:#faf8f5;color:#a08080;border:1px solid #fde8ee}
+.format-tag{font-size:10px;padding:2px 8px;border-radius:20px;background:#fff3cd;color:#7a5000;font-weight:600;text-transform:uppercase;letter-spacing:0.4px}
 
 /* ── FORM FIELDS ── */
-.field-label {
-  font-size: 10px; color: #bbb; margin-bottom: 3px;
-  display: block; margin-top: 10px; text-transform: uppercase; letter-spacing: 0.4px;
-  font-weight: 600;
-}
-.field-label:first-child { margin-top: 0; }
-.field-input {
-  width: 100%; padding: 7px 10px; font-size: 12px;
-  border: 0.5px solid #fde8ee; border-radius: 8px;
-  outline: none; color: #333; background: #fff8fa;
-  font-family: inherit; transition: border-color 0.2s;
-}
-.field-input:focus { border-color: #ffabbf; }
-textarea.field-input { resize: vertical; }
+.field-label{font-size:10px;color:#bbb;margin-bottom:3px;display:block;margin-top:10px;text-transform:uppercase;letter-spacing:0.4px;font-weight:600}
+.field-label:first-child{margin-top:0}
+.field-input{width:100%;padding:7px 10px;font-size:12px;border:0.5px solid #fde8ee;border-radius:8px;outline:none;color:#333;background:#fff8fa;font-family:inherit;transition:border-color 0.2s}
+.field-input:focus{border-color:#ffabbf}
+textarea.field-input{resize:vertical}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.field-row>div{display:flex;flex-direction:column}
+.field-row .field-label{margin-top:0}
 
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-.field-row > div { display: flex; flex-direction: column; }
-.field-row .field-label { margin-top: 0; }
+/* caption counter */
+.caption-wrap{position:relative;margin-top:10px}
+.caption-counter{position:absolute;bottom:8px;right:8px;font-size:10px;color:#ccc;pointer-events:none;background:rgba(255,248,250,0.9);padding:1px 4px;border-radius:4px;font-weight:500;transition:color 0.2s}
+.caption-counter.ok{color:#4caf82}
+.caption-counter.warning{color:#e0607a}
+.caption-counter.over{color:#c03040}
+.caption-hint{font-size:10px;margin-top:3px;letter-spacing:0.2px}
+.caption-hint.ok{color:#4caf82}
+.caption-hint.warning{color:#ff8c00}
+.caption-hint.over{color:#c03040}
 
-/* ── CAPTION COUNTER ── */
-.caption-wrap { position: relative; margin-top: 10px; }
-.caption-counter {
-  position: absolute; bottom: 8px; right: 8px;
-  font-size: 10px; color: #ccc; pointer-events: none;
-  background: rgba(255,248,250,0.9); padding: 1px 4px; border-radius: 4px;
-  font-weight: 500; transition: color 0.2s;
-}
-.caption-counter.ok      { color: #4caf82; }
-.caption-counter.warning { color: #e0607a; }
-.caption-counter.over    { color: #c03040; }
-.caption-hint {
-  font-size: 10px; margin-top: 3px; letter-spacing: 0.2px;
-}
-.caption-hint.ok      { color: #4caf82; }
-.caption-hint.warning { color: #ff8c00; }
-.caption-hint.over    { color: #c03040; }
+/* copy button */
+.field-with-copy{position:relative}
+.copy-btn{position:absolute;top:50%;right:8px;transform:translateY(-50%);font-size:10px;font-weight:600;color:#e0607a;background:rgba(255,248,250,0.9);border:none;cursor:pointer;padding:2px 7px;border-radius:4px;font-family:inherit;transition:background 0.15s}
+.copy-btn:hover{background:#fde8ee}
+.copy-btn.copied{color:#4caf82}
+.field-with-copy .field-input{padding-right:56px}
 
-/* ── COPY BUTTON ── */
-.field-with-copy { position: relative; }
-.copy-btn {
-  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
-  font-size: 10px; font-weight: 600; color: #e0607a;
-  background: rgba(255,248,250,0.9); border: none; cursor: pointer;
-  padding: 2px 7px; border-radius: 4px; font-family: inherit;
-  transition: background 0.15s;
-}
-.copy-btn:hover { background: #fde8ee; }
-.copy-btn.copied { color: #4caf82; }
-.field-with-copy .field-input { padding-right: 56px; }
+/* URL section */
+.url-section{padding:12px 14px 14px;border-top:0.5px solid #fde8ee}
+.section-divider{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#ddd;font-weight:600;margin-bottom:8px}
+.apply-btn{margin-top:12px;padding:9px 14px;font-size:12px;background:#ffabbf;color:#fff;border:none;border-radius:8px;cursor:pointer;width:100%;font-family:inherit;font-weight:600;transition:background 0.2s;letter-spacing:0.3px}
+.apply-btn:hover{background:#e0607a}
 
-/* ── URL SECTION ── */
-.url-section {
-  padding: 12px 14px 14px;
-  border-top: 0.5px solid #fde8ee;
-}
-.section-divider {
-  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
-  color: #ddd; font-weight: 600; margin-bottom: 8px;
-}
-.apply-btn {
-  margin-top: 12px; padding: 9px 14px; font-size: 12px;
-  background: #ffabbf; color: #fff; border: none; border-radius: 8px;
-  cursor: pointer; width: 100%; font-family: inherit; font-weight: 600;
-  transition: background 0.2s; letter-spacing: 0.3px;
-}
-.apply-btn:hover { background: #e0607a; }
+/* ── APPROVAL SECTION (client view) ── */
+.approval-section{padding:14px 16px;border-top:0.5px solid #fde8ee}
+.approval-status-display{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.approval-badge{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;letter-spacing:0.3px}
+.approval-badge.ap-pending{background:#fff3cd;color:#7a5000}
+.approval-badge.ap-approved{background:#d4f0e4;color:#1a6b40}
+.approval-badge.ap-revision{background:#fde8ee;color:#c05070}
+.approval-actions{display:flex;flex-direction:column;gap:8px}
+.approve-btn{padding:10px 16px;font-size:12px;font-weight:600;border:none;border-radius:8px;cursor:pointer;font-family:inherit;transition:background 0.2s;letter-spacing:0.3px;width:100%}
+.approve-btn.green{background:#d4f0e4;color:#1a6b40}
+.approve-btn.green:hover{background:#c0e8d4}
+.approve-btn.pink{background:#fde8ee;color:#c05070}
+.approve-btn.pink:hover{background:#fdd4de}
+.revision-area{margin-top:8px}
+.revision-textarea{width:100%;padding:9px 12px;font-size:12px;border:0.5px solid #fde8ee;border-radius:8px;outline:none;color:#333;background:#fff8fa;font-family:inherit;resize:vertical;min-height:80px}
+.revision-textarea:focus{border-color:#ffabbf}
+.revision-send-btn{margin-top:8px;padding:9px 14px;font-size:12px;background:#e0607a;color:#fff;border:none;border-radius:8px;cursor:pointer;width:100%;font-family:inherit;font-weight:600;transition:background 0.2s}
+.revision-send-btn:hover{background:#c04060}
+.client-comment-display{margin-top:8px;padding:8px 10px;background:#fff0f3;border-radius:8px;font-size:12px;color:#c05070;line-height:1.5;border:0.5px solid #fde8ee}
+.client-comment-display strong{display:block;font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.4px;margin-bottom:3px}
+
+/* approval info in admin view */
+.approval-admin-info{padding:10px 14px 0}
+.approval-admin-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
+.approval-admin-label{font-size:10px;color:#bbb;text-transform:uppercase;letter-spacing:0.4px;font-weight:600}
+.admin-comment-box{width:100%;padding:7px 10px;font-size:12px;border:0.5px solid #fde8ee;border-radius:8px;color:#888;background:#f9f9f9;font-family:inherit;resize:none;cursor:default}
 
 /* ── PRESENTATION MODE ── */
-body.present-mode .ig-wrapper {
-  border: none;
-  border-radius: 0;
-  max-width: 100%;
-}
-body.present-mode .top-bar { display: none; }
-body.present-mode .grid-stats { display: none; }
-body.present-mode .pillar-filter { display: none; }
-body.present-mode .add-post-btn { display: none; }
-body.present-mode .ig-footer { display: none; }
-body.present-mode .ig-cell { cursor: default; }
-body.present-mode .ig-cell-num { display: none; }
-
-.present-bar {
-  display: none;
-  padding: 10px 14px;
-  background: #3b0510;
-  align-items: center; justify-content: space-between;
-}
-body.present-mode .present-bar { display: flex; }
-.present-bar-title { font-size: 12px; color: #ffabbf; font-weight: 600; letter-spacing: 0.3px; }
-.present-exit-btn {
-  font-size: 11px; color: #fff; background: rgba(255,171,191,0.2);
-  border: 0.5px solid rgba(255,171,191,0.4); border-radius: 20px;
-  padding: 4px 12px; cursor: pointer; font-family: inherit; transition: background 0.15s;
-}
-.present-exit-btn:hover { background: rgba(255,171,191,0.35); }
+body.present-mode .ig-wrapper{border:none;border-radius:0;max-width:100%}
+body.present-mode .top-bar{display:none}
+body.present-mode .grid-stats{display:none}
+body.present-mode .pillar-filter{display:none}
+body.present-mode .add-post-btn{display:none}
+body.present-mode .ig-footer{display:none}
+body.present-mode .ig-cell{cursor:default}
+.present-bar{display:none;padding:10px 14px;background:#3b0510;align-items:center;justify-content:space-between}
+body.present-mode .present-bar{display:flex}
+.present-bar-title{font-size:12px;color:#ffabbf;font-weight:600;letter-spacing:0.3px}
+.present-exit-btn{font-size:11px;color:#fff;background:rgba(255,171,191,0.2);border:0.5px solid rgba(255,171,191,0.4);border-radius:20px;padding:4px 12px;cursor:pointer;font-family:inherit;transition:background 0.15s}
+.present-exit-btn:hover{background:rgba(255,171,191,0.35)}
 
 /* ── ADD MODAL ── */
-.content-map { padding: 12px 14px; display: none; }
-.content-map.visible { display: block; }
-.month-sep {
-  font-size: 10px; font-weight: 600; color: #ffabbf;
-  text-transform: uppercase; letter-spacing: 0.8px;
-  padding: 8px 0 4px; border-bottom: 0.5px solid #fde8ee; margin-bottom: 4px;
-}
-.map-row {
-  display: flex; align-items: center; gap: 10px; padding: 9px 0;
-  border-bottom: 0.5px solid #fde8ee; cursor: pointer;
-  border-radius: 6px; transition: background 0.15s;
-}
-.map-row:last-child { border-bottom: none; }
-.map-row:hover { background: #fff5f7; }
-.map-num { font-size: 11px; color: #ddd; width: 18px; text-align: right; flex-shrink: 0; }
-.map-pillar-bar { width: 4px; height: 34px; border-radius: 3px; flex-shrink: 0; }
-.map-info { flex: 1; min-width: 0; }
-.map-title { font-size: 12px; font-weight: 500; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.map-meta { font-size: 10px; color: #bbb; margin-top: 1px; }
-.map-status { flex-shrink: 0; }
+.modal-title{font-size:14px;font-weight:600;color:#1a1a1a;margin-bottom:12px}
 </style>
 </head>
 <body>
 
 <div class="ig-wrapper">
+
+  <!-- CLIENT MODE BANNER -->
+  <div class="client-banner">
+    <span class="client-banner-text">🌿 Aperçu feed — Approbation du contenu</span>
+    <span class="client-mode-badge">Vue Marine</span>
+  </div>
 
   <!-- PRESENTATION MODE BAR -->
   <div class="present-bar">
@@ -381,10 +228,13 @@ body.present-mode .present-bar { display: flex; }
 
   <!-- TOP BAR -->
   <div class="top-bar">
-    <span class="top-bar-title">Ō Ma Biche · Feed Mois d'Avril 2026 <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span></span>
+    <span class="top-bar-title">
+      Ō Ma Biche · Feed Mois d'Avril 2026
+      <span style="font-size:10px;font-weight:400;color:#bbb;margin-left:6px">· Google Sheets</span>
+    </span>
     <div class="top-bar-right">
       <span class="save-indicator" id="saveIndicator">● chargement…</span>
-      <button class="icon-btn" onclick="enterPresent()" title="Mode présentation">Présenter</button>
+      <button class="icon-btn top-bar-admin-only" onclick="enterPresent()" title="Mode présentation">Présenter</button>
     </div>
   </div>
 
@@ -394,8 +244,8 @@ body.present-mode .present-bar { display: flex; }
   <!-- STATS -->
   <div class="grid-stats">
     <div class="grid-counter">
-      <strong id="publishedCount">0</strong> pub · 
-      <strong id="scheduledCount">0</strong> planif · 
+      <strong id="publishedCount">0</strong> pub ·
+      <strong id="scheduledCount">0</strong> planif ·
       <strong id="draftCount">0</strong> brouill
     </div>
     <div class="progress-bar-wrap">
@@ -412,32 +262,41 @@ body.present-mode .present-bar { display: flex; }
     <button class="pf-btn" onclick="filterPillar('connexion',this)"><div class="pf-dot" style="background:#fde8ee;border:1px solid #ffabbf"></div>Connexion</button>
   </div>
 
-  <!-- ADD BUTTON -->
-  <button class="add-post-btn" onclick="openAddModal()">
+  <!-- ADD BUTTON (admin only) -->
+  <button class="add-post-btn top-bar-admin-only" onclick="openAddModal()">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     Ajouter un post
   </button>
 
-  <div class="ig-footer">Ō Ma Biche · Feed Preview — Atelier Léman Digitale</div>
+  <div class="ig-footer">Ō Ma Biche · Feed Preview v5 — Atelier Léman Digitale</div>
 </div>
 
 <!-- ── POST MODAL ── -->
 <div class="modal" id="postModal" onclick="handleModalClick(event,'postModal')">
   <div class="modal-card">
+
+    <!-- Media area (shared) -->
     <div id="modalImgArea"></div>
-    <div class="modal-nav">
+
+    <!-- Caption display (shared — always visible) -->
+    <div class="modal-caption-area" id="modalCaptionArea"></div>
+
+    <!-- Post nav (admin only) -->
+    <div class="modal-nav top-bar-admin-only">
       <button class="nav-btn" id="prevBtn" onclick="navigatePost(-1)">‹ Préc.</button>
       <span id="navCounter" style="font-size:11px;color:#ccc"></span>
       <button class="nav-btn" id="nextBtn" onclick="navigatePost(1)">Suiv. ›</button>
     </div>
-    <div class="modal-body">
+
+    <!-- ADMIN BODY -->
+    <div id="adminModalBody" class="modal-body">
       <div class="modal-header">
+        <div class="modal-meta" id="modalMeta"></div>
         <button class="modal-close" onclick="closeModal('postModal')">✕</button>
       </div>
-      <div class="modal-meta" id="modalMeta"></div>
 
       <label class="field-label">Titre</label>
-      <input class="field-input" id="editTitle" placeholder="Titre du post..." />
+      <input class="field-input" id="editTitle" placeholder="Titre du post…" />
 
       <div class="field-row">
         <div>
@@ -460,43 +319,77 @@ body.present-mode .present-bar { display: flex; }
 
       <div class="caption-wrap">
         <label class="field-label" style="margin-top:10px">Caption</label>
-        <textarea class="field-input" id="editCaption" rows="4"
-          placeholder="Texte du post..." oninput="updateCaptionCounter()"></textarea>
+        <textarea class="field-input" id="editCaption" rows="4" placeholder="Texte du post…" oninput="updateCaptionCounter()"></textarea>
         <span class="caption-counter" id="captionCounter">0</span>
       </div>
       <div class="caption-hint" id="captionHint"></div>
 
       <label class="field-label">Hashtags</label>
       <div class="field-with-copy">
-        <input class="field-input" id="editHashtags" placeholder="#lausanne #microshading..." />
+        <input class="field-input" id="editHashtags" placeholder="#lausanne #microshading…" />
         <button class="copy-btn" id="copyHashtagsBtn" onclick="copyField('editHashtags','copyHashtagsBtn')">Copier</button>
       </div>
 
       <label class="field-label">Date prévue</label>
       <input class="field-input" id="editDate" placeholder="Ex: 14 avr. 2026" />
+
+      <!-- Approval info (admin: read-only) -->
+      <div class="approval-admin-info" id="approvalAdminInfo" style="margin-top:10px;padding:0">
+        <div class="approval-admin-row">
+          <span class="approval-admin-label">Statut approbation :</span>
+          <span class="approval-badge ap-pending" id="adminApprovalBadge">⏳ En attente</span>
+        </div>
+        <div id="adminCommentBox" style="display:none">
+          <label class="field-label">Commentaire de Marine</label>
+          <textarea class="admin-comment-box" id="adminClientComment" rows="3" readonly></textarea>
+        </div>
+      </div>
     </div>
 
-    <div class="url-section">
+    <!-- URL SECTION (admin only) -->
+    <div class="url-section top-bar-admin-only">
       <div class="section-divider">Image & Vidéo</div>
       <label class="field-label">URL Cover / Image</label>
-      <input class="field-input" type="url" id="urlInput" placeholder="https://..." />
+      <input class="field-input" type="url" id="urlInput" placeholder="https://…" />
       <div id="urlHint" style="font-size:10px;color:#bbb;margin-top:4px;line-height:1.5;display:none"></div>
+
       <label class="field-label">URL Vidéo Reel (.mp4, Drive, Dropbox…)</label>
-      <input class="field-input" type="url" id="videoInput" placeholder="https://..." />
+      <input class="field-input" type="url" id="videoInput" placeholder="https://…" />
+
+      <label class="field-label">Slides Carousel (URLs séparées par |)</label>
+      <textarea class="field-input" id="slidesInput" rows="3" placeholder="https://url1.jpg | https://url2.jpg | https://url3.jpg"></textarea>
+      <div style="font-size:10px;color:#bbb;margin-top:3px;line-height:1.5">Sépare chaque slide par espace+|+espace (ex: url1 | url2)</div>
+
       <button class="apply-btn" onclick="savePost()">Enregistrer — ⌘↵</button>
     </div>
+
+    <!-- CLIENT BODY (Marine) -->
+    <div id="clientModalBody" class="modal-body" style="display:none">
+      <div class="modal-header">
+        <div class="modal-meta" id="clientModalMeta"></div>
+        <button class="modal-close" onclick="closeModal('postModal')">✕</button>
+      </div>
+      <div style="margin-bottom:4px">
+        <p style="font-size:13px;font-weight:600;color:#1a1a1a" id="clientPostTitle"></p>
+        <p style="font-size:11px;color:#bbb;margin-top:2px" id="clientPostDate"></p>
+      </div>
+
+      <!-- Approval section -->
+      <div class="approval-section" id="clientApprovalSection">
+        <!-- injected by JS -->
+      </div>
+    </div>
+
   </div>
 </div>
 
-<!-- ── ADD MODAL ── -->
+<!-- ── ADD MODAL (admin only) ── -->
 <div class="modal" id="addModal" onclick="handleModalClick(event,'addModal')">
   <div class="modal-card">
     <div class="modal-body">
       <div class="modal-header">
+        <p class="modal-title">Nouveau post</p>
         <button class="modal-close" onclick="closeModal('addModal')">✕</button>
-      </div>
-      <div style="margin-bottom:12px">
-        <p style="font-size:14px;font-weight:600;color:#1a1a1a">Nouveau post</p>
       </div>
 
       <label class="field-label">Titre *</label>
@@ -530,123 +423,113 @@ body.present-mode .present-bar { display: flex; }
       </select>
 
       <label class="field-label">Caption</label>
-      <textarea class="field-input" id="newCaption" rows="3" placeholder="Texte du post..."></textarea>
+      <textarea class="field-input" id="newCaption" rows="3" placeholder="Texte du post…"></textarea>
 
       <label class="field-label">Hashtags</label>
-      <input class="field-input" id="newHashtags" placeholder="#lausanne #microshading..." />
+      <input class="field-input" id="newHashtags" placeholder="#lausanne #microshading…" />
 
       <label class="field-label">Date prévue</label>
       <input class="field-input" id="newDate" placeholder="Ex: 14 avr. 2026" />
 
-      <button class="apply-btn" onclick="addPost()">Ajouter à la grille</button>
+      <button class="apply-btn" onclick="addPost()" style="margin-top:14px">Ajouter à la grille</button>
     </div>
   </div>
 </div>
 
 <script>
 /* ── CONSTANTS ── */
-// ⚠️ Remplace cette URL par l'URL de ton Google Apps Script déployé
 const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby9hyrIS0QYuGQGosmNPMMu2d4yRmQYrUNYG6gd7o4SyM1M7N6vg9HWAtBWfrUvAOOa/exec';
 const CAPTION_SOFT = 125;
 const CAPTION_MAX  = 2200;
 
+/* Mode detection: ?mode=client → Marine's approval view */
+const IS_CLIENT = new URLSearchParams(location.search).get('mode') === 'client';
+if (IS_CLIENT) {
+  document.body.classList.add('client-mode');
+  document.title = 'Ō Ma Biche — Approbation du contenu';
+}
+
 const PILLAR = {
-  transformation: { dot:'pillar-transformation', tag:'pt-transformation', label:'Transformation', color:'#e0607a' },
-  expertise:      { dot:'pillar-expertise',      tag:'pt-expertise',      label:'Expertise',      color:'#a0506a' },
-  confiance:      { dot:'pillar-confiance',       tag:'pt-confiance',      label:'Confiance',      color:'#ffabbf' },
-  connexion:      { dot:'pillar-connexion',       tag:'pt-connexion',      label:'Connexion',      color:'#fde8ee' }
-};
-const STATUS = {
-  published: { cls:'status-published', label:'Publié' },
-  scheduled:  { cls:'status-scheduled',  label:'Planifié' },
-  draft:      { cls:'status-draft',      label:'Brouillon' }
+  transformation:{ dot:'pillar-transformation', tag:'pt-transformation', label:'Transformation', color:'#e0607a' },
+  expertise:     { dot:'pillar-expertise',      tag:'pt-expertise',      label:'Expertise',      color:'#a0506a' },
+  confiance:     { dot:'pillar-confiance',       tag:'pt-confiance',      label:'Confiance',      color:'#ffabbf' },
+  connexion:     { dot:'pillar-connexion',       tag:'pt-connexion',      label:'Connexion',      color:'#fde8ee' }
 };
 
-/* ── DEFAULT POSTS (12 — Mois 1 seulement) ── */
+const STATUS = {
+  published:{ cls:'status-published', label:'Publié'   },
+  scheduled:{ cls:'status-scheduled', label:'Planifié'  },
+  draft:    { cls:'status-draft',     label:'Brouillon' }
+};
+
+const APPROVAL = {
+  'En attente':        { cls:'ap-pending',  badge:'ap-badge-pending',  icon:'⏳', label:'En attente'        },
+  'Approuvé':          { cls:'ap-approved', badge:'ap-badge-approved', icon:'✅', label:'Approuvé'          },
+  'Révision demandée': { cls:'ap-revision', badge:'ap-badge-revision', icon:'✏️', label:'Révision demandée' }
+};
+
+function getApproval(post) {
+  const key = post.approval_status || 'En attente';
+  return APPROVAL[key] || APPROVAL['En attente'];
+}
+
+/* ── DEFAULT POSTS (12) ── */
 const DEFAULT_POSTS = [
-  { id:1,  title:'Pour qui est fait le microshading ?',       url:'', videoUrl:'', pillar:'confiance',      format:'Carousel', status:'scheduled', date:'9 mai 2026',   caption:'Profil type de mes clientes. Vous vous reconnaissez ? Le lien pour réserver est en bio.',                                                                   hashtags:'#microshading #sourcils #lausanne #clientideal #omabiche' },
-  { id:2,  title:'La cliente qui m\'a réconciliée',           url:'', videoUrl:'', pillar:'connexion',      format:'Reel',     status:'scheduled', date:'7 mai 2026',   caption:'Il y a une cliente qui m\'a rappelé pourquoi je fais ce métier. Cette semaine, je vous raconte.',                                                           hashtags:'#histoireclient #pmu #microshading #beaute #lausanne' },
-  { id:3,  title:'FAQ — vos 3 questions les plus posées',     url:'', videoUrl:'', pillar:'expertise',      format:'Reel',     status:'scheduled', date:'5 mai 2026',   caption:'Est-ce douloureux ? Combien de temps ça dure ? Est-ce que ça fait naturel ? Je réponds.',                                                                   hashtags:'#faq #microshading #lausanne #maquillagesemipermanent' },
-  { id:4,  title:'Avant / Après — lèvres naturelles',         url:'', videoUrl:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'2 mai 2026',   caption:'Des lèvres redessinées. Sans injection. Sans douleur. Voilà le résultat.',                                                                                 hashtags:'#levres #lipliner #beaute #lausanne #semipermanent' },
-  { id:5,  title:'12 ans — ce que j\'ai appris',              url:'', videoUrl:'', pillar:'connexion',      format:'Carousel', status:'scheduled', date:'30 avr. 2026', caption:'Ce que 12 ans de maquillage semi-permanent m\'ont appris sur mes clientes. Et sur moi.',                                                                    hashtags:'#pmu #microshading #lausanne #beauté #artiste' },
-  { id:6,  title:'CHF 250 — le calcul qui change tout',       url:'', videoUrl:'', pillar:'confiance',      format:'Reel',     status:'scheduled', date:'28 avr. 2026', caption:'CHF 250 pour un microshading. Trop cher ? Faisons le calcul : 34 centimes par matin pendant 2 ans.',                                                        hashtags:'#microshading #investissement #beautelausanne #sourcilsnaturels' },
-  { id:7,  title:'Rehaussement cils — coulisses',             url:'', videoUrl:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'25 avr. 2026', caption:'Regardez ça. Aucun filtre. Le rehaussement de cils que tout le monde devrait connaître.',                                                                   hashtags:'#rehaussementcils #cils #lausanne #beautynaturelle #omabiche' },
-  { id:8,  title:'Témoignages — "4 ans de fidélité"',         url:'', videoUrl:'', pillar:'confiance',      format:'Carousel', status:'scheduled', date:'23 avr. 2026', caption:'Ce que mes clientes disent après 12 ans. Leurs mots, pas les miens.',                                                                                       hashtags:'#avis #témoignages #maquillagesemipermanent #omabiche #lausanne' },
-  { id:9,  title:'Ce que personne ne dit sur la durée',       url:'', videoUrl:'', pillar:'expertise',      format:'Reel',     status:'scheduled', date:'21 avr. 2026', caption:'Ce que personne ne vous dit sur la durée d\'un microshading. 3 facteurs qui changent tout.',                                                               hashtags:'#semipermanent #pmulausanne #microshading #sourcils' },
-  { id:10, title:'Avant / Après — réconciliation PMU',        url:'', videoUrl:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'18 avr. 2026', caption:'Elle revenait après une mauvaise expérience ailleurs. Voici ce qu\'on a fait. Résultat 3 semaines après.',                                               hashtags:'#avantapres #sourcils #dermopigmentation #lausanne #microshading' },
-  { id:11, title:'Microshading vs Microblading',              url:'', videoUrl:'', pillar:'expertise',      format:'Carousel', status:'scheduled', date:'16 avr. 2026', caption:'Microshading ou microblading : lequel est fait pour vous ? Les différences expliquées en 5 slides.',                                                     hashtags:'#microshading #microblading #sourcilsnaturels #beautelausanne #pmulausanne' },
-  { id:12, title:'Introduction — Marine & son histoire',      url:'', videoUrl:'', pillar:'connexion',      format:'Reel',     status:'scheduled', date:'14 avr. 2026', caption:'Je m\'appelle Marine. Voilà ce que je fais depuis 12 ans — et pourquoi je ne fais jamais ce que les autres font.',                                        hashtags:'#lausanne #maquillagesemipermanent #microshading #omabiche #beautelausanne' }
+  { id:1,  title:"Pour qui est fait le microshading ?",     url:'', videoUrl:'', slides:'', pillar:'confiance',      format:'Carousel', status:'scheduled', date:'9 mai 2026',    caption:"Profil type de mes clientes. Vous vous reconnaissez ? Le lien pour réserver est en bio.",                     hashtags:'#microshading #sourcils #lausanne #clientideal #omabiche',               approval_status:'En attente', client_comments:'' },
+  { id:2,  title:"La cliente qui m'a réconciliée",          url:'', videoUrl:'', slides:'', pillar:'connexion',      format:'Reel',     status:'scheduled', date:'7 mai 2026',    caption:"Il y a une cliente qui m'a rappelé pourquoi je fais ce métier. Cette semaine, je vous raconte.",           hashtags:'#histoireclient #pmu #microshading #beaute #lausanne',                    approval_status:'En attente', client_comments:'' },
+  { id:3,  title:"FAQ — vos 3 questions les plus posées",   url:'', videoUrl:'', slides:'', pillar:'expertise',      format:'Reel',     status:'scheduled', date:'5 mai 2026',    caption:"Est-ce douloureux ? Combien de temps ça dure ? Est-ce que ça fait naturel ? Je réponds.",                  hashtags:'#faq #microshading #lausanne #maquillagesemipermanent',                   approval_status:'En attente', client_comments:'' },
+  { id:4,  title:"Avant / Après — lèvres naturelles",       url:'', videoUrl:'', slides:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'2 mai 2026',    caption:"Des lèvres redessinées. Sans injection. Sans douleur. Voilà le résultat.",                                hashtags:'#levres #lipliner #beaute #lausanne #semipermanent',                      approval_status:'En attente', client_comments:'' },
+  { id:5,  title:"12 ans — ce que j'ai appris",             url:'', videoUrl:'', slides:'', pillar:'connexion',      format:'Carousel', status:'scheduled', date:'30 avr. 2026', caption:"Ce que 12 ans de maquillage semi-permanent m'ont appris sur mes clientes. Et sur moi.",                    hashtags:'#pmu #microshading #lausanne #beauté #artiste',                           approval_status:'En attente', client_comments:'' },
+  { id:6,  title:"CHF 250 — le calcul qui change tout",     url:'', videoUrl:'', slides:'', pillar:'confiance',      format:'Reel',     status:'scheduled', date:'28 avr. 2026', caption:"CHF 250 pour un microshading. Trop cher ? Faisons le calcul : 34 centimes par matin pendant 2 ans.",      hashtags:'#microshading #investissement #beautelausanne #sourcilsnaturels',         approval_status:'En attente', client_comments:'' },
+  { id:7,  title:"Rehaussement cils — coulisses",           url:'', videoUrl:'', slides:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'25 avr. 2026', caption:"Regardez ça. Aucun filtre. Le rehaussement de cils que tout le monde devrait connaître.",                 hashtags:'#rehaussementcils #cils #lausanne #beautynaturelle #omabiche',            approval_status:'En attente', client_comments:'' },
+  { id:8,  title:'Témoignages — "4 ans de fidélité"',       url:'', videoUrl:'', slides:'', pillar:'confiance',      format:'Carousel', status:'scheduled', date:'23 avr. 2026', caption:"Ce que mes clientes disent après 12 ans. Leurs mots, pas les miens.",                                      hashtags:'#avis #témoignages #maquillagesemipermanent #omabiche #lausanne',         approval_status:'En attente', client_comments:'' },
+  { id:9,  title:"Ce que personne ne dit sur la durée",     url:'', videoUrl:'', slides:'', pillar:'expertise',      format:'Reel',     status:'scheduled', date:'21 avr. 2026', caption:"Ce que personne ne vous dit sur la durée d'un microshading. 3 facteurs qui changent tout.",               hashtags:'#semipermanent #pmulausanne #microshading #sourcils',                     approval_status:'En attente', client_comments:'' },
+  { id:10, title:"Avant / Après — réconciliation PMU",      url:'', videoUrl:'', slides:'', pillar:'transformation', format:'Reel',     status:'scheduled', date:'18 avr. 2026', caption:"Elle revenait après une mauvaise expérience ailleurs. Voici ce qu'on a fait. Résultat 3 semaines après.", hashtags:'#avantapres #sourcils #dermopigmentation #lausanne #microshading',        approval_status:'En attente', client_comments:'' },
+  { id:11, title:"Microshading vs Microblading",            url:'', videoUrl:'', slides:'', pillar:'expertise',      format:'Carousel', status:'scheduled', date:'16 avr. 2026', caption:"Microshading ou microblading : lequel est fait pour vous ? Les différences expliquées en 5 slides.",   hashtags:'#microshading #microblading #sourcilsnaturels #beautelausanne #pmulausanne', approval_status:'En attente', client_comments:'' },
+  { id:12, title:"Introduction — Marine & son histoire",    url:'', videoUrl:'', slides:'', pillar:'connexion',      format:'Reel',     status:'scheduled', date:'14 avr. 2026', caption:"Je m'appelle Marine. Voilà ce que je fais depuis 12 ans — et pourquoi je ne fais jamais ce que les autres font.", hashtags:'#lausanne #maquillagesemipermanent #microshading #omabiche #beautelausanne', approval_status:'En attente', client_comments:'' }
 ];
 
 /* ── STATE ── */
-let posts = [];
+let posts         = [];
 let currentPostId = null;
-let activeFilter = 'all';
-let visiblePosts = [];
-let saveTimer = null;
+let activeFilter  = 'all';
+let visiblePosts  = [];
+let saveTimer     = null;
+let carouselIdx   = 0;
 
-/* ── PERSISTENCE — Google Sheets ── */
-/* ── CLEAN POST — nettoie les données venant de Google Sheets ── */
+/* ── CLEAN POST ── */
 function cleanPost(post) {
-  const KNOWN_KEYS = ['id','title','pillar','format','status','date','caption','hashtags','url','videoUrl'];
+  const KNOWN_KEYS = ['id','title','pillar','format','status','date','caption','hashtags','url','videoUrl','slides','approval_status','client_comments'];
   const clean = {};
-
-  // Garde uniquement les clés connues
-  KNOWN_KEYS.forEach(k => {
-    clean[k] = post[k] !== undefined ? post[k] : '';
-  });
-
-  // Convertit l'id en number
+  KNOWN_KEYS.forEach(k => { clean[k] = post[k] !== undefined ? post[k] : ''; });
   if (clean.id && !isNaN(clean.id)) clean.id = Number(clean.id);
-
-  // Nettoie les dates au format JS long (ex: "Tue Apr 14 2026 02:00:00 GMT+...")
-  // → extrait uniquement "14 avr. 2026" ou conserve si déjà court
   if (clean.date && clean.date.length > 20) {
     try {
       const d = new Date(clean.date);
-      if (!isNaN(d)) {
-        clean.date = d.toLocaleDateString('fr-CH', {
-          day: 'numeric', month: 'short', year: 'numeric',
-          timeZone: 'Europe/Zurich'
-        });
-      }
+      if (!isNaN(d)) clean.date = d.toLocaleDateString('fr-CH',{ day:'numeric', month:'short', year:'numeric', timeZone:'Europe/Zurich' });
     } catch(e) {}
   }
-
+  if (!clean.approval_status) clean.approval_status = 'En attente';
   return clean;
 }
 
-/* ── JSONP helper — contourne CORS complètement ── */
+/* ── JSONP ── */
 function jsonpFetch(url) {
   return new Promise((resolve, reject) => {
     const cbName = '__cb_' + Date.now() + '_' + Math.floor(Math.random() * 1e6);
     const script = document.createElement('script');
-    const timeout = setTimeout(() => {
-      cleanup();
-      reject(new Error('JSONP timeout'));
-    }, 12000);
-
-    function cleanup() {
-      clearTimeout(timeout);
-      delete window[cbName];
-      if (script.parentNode) script.parentNode.removeChild(script);
-    }
-
-    window[cbName] = function(data) {
-      cleanup();
-      resolve(data);
-    };
-
+    const timeout = setTimeout(() => { cleanup(); reject(new Error('JSONP timeout')); }, 12000);
+    function cleanup() { clearTimeout(timeout); delete window[cbName]; if (script.parentNode) script.parentNode.removeChild(script); }
+    window[cbName] = data => { cleanup(); resolve(data); };
     script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cbName;
-    script.onerror = () => { cleanup(); reject(new Error('JSONP script error')); };
+    script.onerror = () => { cleanup(); reject(new Error('JSONP error')); };
     document.head.appendChild(script);
   });
 }
 
+/* ── LOAD / SAVE ── */
 function loadPosts() {
   setSaveIndicator('saving', '● chargement…');
-
-  // Essai JSONP (contourne CORS)
   jsonpFetch(APPS_SCRIPT_URL + '?method=load')
     .then(data => {
       if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
@@ -654,16 +537,13 @@ function loadPosts() {
         setSaveIndicator('saved', '● Google Sheets ✓');
         renderGrid();
       } else {
-        // Sheet vide → charger défauts et sauvegarder
         posts = JSON.parse(JSON.stringify(DEFAULT_POSTS));
         setSaveIndicator('saving', '● initialisation…');
         renderGrid();
         _pushToSheets();
       }
     })
-    .catch(err => {
-      console.warn('loadPosts JSONP error:', err);
-      // Fallback localStorage
+    .catch(() => {
       try {
         const saved = localStorage.getItem('omabiche_posts_backup');
         if (saved) {
@@ -671,8 +551,7 @@ function loadPosts() {
           if (Array.isArray(parsed) && parsed.length > 0) {
             posts = parsed;
             setSaveIndicator('', '⚠ Sheets off — cache local');
-            renderGrid();
-            return;
+            renderGrid(); return;
           }
         }
       } catch(e2) {}
@@ -683,47 +562,45 @@ function loadPosts() {
 }
 
 function savePosts() {
-  // Backup local immédiat
   try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
   setSaveIndicator('saving', '● sauvegarde…');
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => { _pushToSheets(); }, 800);
+  saveTimer = setTimeout(_pushToSheets, 800);
 }
 
 function _pushToSheets() {
-  // Envoie les posts en plusieurs petits chunks pour éviter la limite de longueur d'URL GET
   const CHUNK = 3;
   const chunks = [];
-  for (let i = 0; i < posts.length; i += CHUNK) {
-    chunks.push(posts.slice(i, i + CHUNK));
-  }
-
-  // Construit la liste d'appels JSONP séquentiels
-  // On envoie d'abord un "clear", puis chaque chunk avec "append"
-  function sendClear() {
-    return jsonpFetch(APPS_SCRIPT_URL + '?method=clear');
-  }
-
-  function sendChunk(chunk) {
-    const encoded = encodeURIComponent(JSON.stringify({ posts: chunk }));
-    return jsonpFetch(APPS_SCRIPT_URL + '?method=append&data=' + encoded);
-  }
-
+  for (let i = 0; i < posts.length; i += CHUNK) chunks.push(posts.slice(i, i + CHUNK));
+  const sendClear  = () => jsonpFetch(APPS_SCRIPT_URL + '?method=clear');
+  const sendChunk  = chunk => jsonpFetch(APPS_SCRIPT_URL + '?method=append&data=' + encodeURIComponent(JSON.stringify({ posts: chunk })));
   sendClear()
-    .then(() => {
-      // Envoyer les chunks séquentiellement via reduce
-      return chunks.reduce((promise, chunk) => {
-        return promise.then(() => sendChunk(chunk));
-      }, Promise.resolve());
-    })
+    .then(() => chunks.reduce((p, chunk) => p.then(() => sendChunk(chunk)), Promise.resolve()))
     .then(() => {
       setSaveIndicator('saved', '● Google Sheets ✓');
       try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
     })
-    .catch(err => {
-      setSaveIndicator('', '⚠ sauvé en local seulement');
-      console.warn('_pushToSheets error:', err);
-    });
+    .catch(() => setSaveIndicator('', '⚠ sauvé en local seulement'));
+}
+
+/* ── APPROVE (Marine → Sheets directement) ── */
+function _approveInSheets(postId, approvalStatus, clientComment) {
+  setSaveIndicator('saving', '● envoi…');
+  const params = '?method=approve'
+    + '&postId=' + encodeURIComponent(postId)
+    + '&approval_status=' + encodeURIComponent(approvalStatus)
+    + '&client_comments=' + encodeURIComponent(clientComment || '');
+  return jsonpFetch(APPS_SCRIPT_URL + params)
+    .then(data => {
+      if (data.ok) {
+        setSaveIndicator('saved', '● Google Sheets ✓');
+        try { localStorage.setItem('omabiche_posts_backup', JSON.stringify(posts)); } catch(e) {}
+      } else {
+        setSaveIndicator('', '⚠ Erreur serveur');
+      }
+      return data;
+    })
+    .catch(() => { setSaveIndicator('', '⚠ Hors ligne'); });
 }
 
 function setSaveIndicator(cls, text) {
@@ -732,14 +609,11 @@ function setSaveIndicator(cls, text) {
   el.textContent = text;
 }
 
-/* ── RENDER GRID ── */
+/* ── GRID ── */
 function renderGrid() {
   const grid = document.getElementById('igGrid');
   grid.innerHTML = '';
-  visiblePosts = (activeFilter === 'all'
-    ? posts
-    : posts.filter(p => p.pillar === activeFilter)
-  ).slice(0, 12);
+  visiblePosts = (activeFilter === 'all' ? posts : posts.filter(p => p.pillar === activeFilter)).slice(0, 12);
 
   visiblePosts.forEach(post => {
     const cell = document.createElement('div');
@@ -747,6 +621,7 @@ function renderGrid() {
     const presentMode = document.body.classList.contains('present-mode');
     if (!presentMode) cell.onclick = () => openPostModal(post.id);
 
+    // Media
     if (post.url) {
       const img = document.createElement('img');
       img.src = post.url; img.alt = post.title;
@@ -756,22 +631,42 @@ function renderGrid() {
       cell.appendChild(makePlaceholder(post));
     }
 
+    // Overlay (status badge)
     const overlay = document.createElement('div');
     overlay.className = 'ig-cell-overlay';
-    const s = STATUS[post.status] || STATUS.draft;
-    if (!presentMode) overlay.innerHTML = `<span class="status-badge ${s.cls}">${s.label}</span>`;
+    if (!presentMode) {
+      const s = STATUS[post.status] || STATUS.draft;
+      overlay.innerHTML = `<span class="status-badge ${s.cls}">${s.label}</span>`;
+    }
     cell.appendChild(overlay);
 
+    // Approval badge (top-left)
+    if (!presentMode) {
+      const ap = getApproval(post);
+      if (post.approval_status && post.approval_status !== 'En attente') {
+        const apBadge = document.createElement('div');
+        apBadge.className = 'approval-cell-badge ap-badge-' + (post.approval_status === 'Approuvé' ? 'approved' : 'revision');
+        apBadge.textContent = ap.icon;
+        cell.appendChild(apBadge);
+      } else if (IS_CLIENT) {
+        const apBadge = document.createElement('div');
+        apBadge.className = 'approval-cell-badge ap-badge-pending';
+        apBadge.textContent = '⏳';
+        cell.appendChild(apBadge);
+      }
+    }
+
+    // Pillar dot
     const dot = document.createElement('div');
-    dot.className = `ig-cell-pillar ${PILLAR[post.pillar]?.dot || ''}`;
+    dot.className = 'ig-cell-pillar ' + (PILLAR[post.pillar]?.dot || '');
     cell.appendChild(dot);
 
-    if (!presentMode) {
+    // Format icon & number (admin only)
+    if (!presentMode && !IS_CLIENT) {
       const fmt = document.createElement('div');
       fmt.className = 'format-icon' + (post.format === 'Reel' && post.videoUrl ? ' has-video' : '');
       fmt.textContent = post.format === 'Reel' ? (post.videoUrl ? '▶' : '▷') : post.format === 'Carousel' ? '⊞' : '□';
       cell.appendChild(fmt);
-
       const num = document.createElement('div');
       num.className = 'ig-cell-num';
       num.textContent = posts.indexOf(post) + 1;
@@ -780,7 +675,6 @@ function renderGrid() {
 
     grid.appendChild(cell);
   });
-
   updateStats();
 }
 
@@ -814,59 +708,102 @@ function filterPillar(pillar, btn) {
   renderGrid();
 }
 
-/* ── CAPTION COUNTER ── */
-function updateCaptionCounter() {
-  const ta = document.getElementById('editCaption');
-  const counter = document.getElementById('captionCounter');
-  const hint = document.getElementById('captionHint');
-  const len = ta.value.length;
-  counter.textContent = len;
-
-  if (len === 0) {
-    counter.className = 'caption-counter';
-    hint.textContent = '';
-    hint.className = 'caption-hint';
-  } else if (len <= CAPTION_SOFT) {
-    counter.className = 'caption-counter ok';
-    hint.textContent = `✓ Visible sans "Voir plus" (${CAPTION_SOFT - len} caract. restants)`;
-    hint.className = 'caption-hint ok';
-  } else if (len <= CAPTION_MAX) {
-    counter.className = 'caption-counter warning';
-    hint.textContent = `⚠ Tronqué après 125 caract. · ${len} / ${CAPTION_MAX}`;
-    hint.className = 'caption-hint warning';
-  } else {
-    counter.className = 'caption-counter over';
-    hint.textContent = `✕ Limite dépassée : ${len - CAPTION_MAX} caract. en trop`;
-    hint.className = 'caption-hint over';
+/* ── CAROUSEL ── */
+function getSlidesArray(post) {
+  if (post.slides && post.slides.trim()) {
+    return post.slides.split('|').map(s => s.trim()).filter(Boolean);
   }
+  if (post.url) return [post.url];
+  return [];
 }
 
-/* ── COPY FIELD ── */
-function copyField(fieldId, btnId) {
-  const val = document.getElementById(fieldId).value;
-  if (!val) return;
-  navigator.clipboard.writeText(val).then(() => {
-    const btn = document.getElementById(btnId);
-    btn.textContent = '✓ Copié';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
-  }).catch(() => showToast('Copie non supportée', '#aaa'));
+let _touchStartX = 0;
+
+function renderCarousel(slides) {
+  carouselIdx = 0;
+  const wrap = document.createElement('div');
+  wrap.className = 'carousel-wrap';
+
+  const slidesEl = document.createElement('div');
+  slidesEl.className = 'carousel-slides';
+  slidesEl.id = 'carouselSlides';
+
+  slides.forEach(url => {
+    const slideEl = document.createElement('div');
+    slideEl.className = 'carousel-slide';
+    if (url) {
+      const img = document.createElement('img');
+      img.src = url; img.alt = 'slide';
+      img.onerror = () => { img.style.display='none'; };
+      slideEl.appendChild(img);
+    } else {
+      slideEl.innerHTML = `<div class="slide-placeholder"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ffabbf" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-5-5L5 21"/></svg><span>Image</span></div>`;
+    }
+    slidesEl.appendChild(slideEl);
+  });
+
+  wrap.appendChild(slidesEl);
+
+  // Prev / Next buttons
+  if (slides.length > 1) {
+    const prevBtn = document.createElement('button');
+    prevBtn.className = 'carousel-nav prev'; prevBtn.textContent = '❮'; prevBtn.id = 'carPrev';
+    prevBtn.onclick = e => { e.stopPropagation(); carouselMove(-1, slides.length); };
+    prevBtn.disabled = true;
+    wrap.appendChild(prevBtn);
+
+    const nextBtn = document.createElement('button');
+    nextBtn.className = 'carousel-nav next'; nextBtn.textContent = '❯'; nextBtn.id = 'carNext';
+    nextBtn.onclick = e => { e.stopPropagation(); carouselMove(1, slides.length); };
+    wrap.appendChild(nextBtn);
+
+    // Dots
+    const dotsEl = document.createElement('div');
+    dotsEl.className = 'carousel-dots'; dotsEl.id = 'carDots';
+    slides.forEach((_, i) => {
+      const d = document.createElement('button');
+      d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      d.onclick = e => { e.stopPropagation(); carouselGoTo(i, slides.length); };
+      dotsEl.appendChild(d);
+    });
+    wrap.appendChild(dotsEl);
+  }
+
+  // Touch
+  wrap.addEventListener('touchstart', e => { _touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+  wrap.addEventListener('touchend', e => {
+    const diff = _touchStartX - e.changedTouches[0].screenX;
+    if (Math.abs(diff) > 50) carouselMove(diff > 0 ? 1 : -1, slides.length);
+  });
+
+  return wrap;
 }
 
-/* ── PRESENTATION MODE ── */
-function enterPresent() {
-  document.body.classList.add('present-mode');
-  renderGrid();
-}
-function exitPresent() {
-  document.body.classList.remove('present-mode');
-  renderGrid();
+function carouselMove(dir, total) {
+  carouselGoTo(Math.max(0, Math.min(total - 1, carouselIdx + dir)), total);
 }
 
-/* ── POST MODAL ── */
+function carouselGoTo(idx, total) {
+  carouselIdx = idx;
+  const slidesEl = document.getElementById('carouselSlides');
+  if (slidesEl) slidesEl.style.transform = `translateX(-${idx * 100}%)`;
+  const prev = document.getElementById('carPrev');
+  const next = document.getElementById('carNext');
+  if (prev) prev.disabled = idx === 0;
+  if (next) next.disabled = idx === total - 1;
+  const dots = document.querySelectorAll('#carDots .carousel-dot');
+  dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+}
+
+/* ── MODAL MEDIA ── */
 function renderModalMedia(post) {
   const imgArea = document.getElementById('modalImgArea');
-  if (post.videoUrl) {
+  const slides = getSlidesArray(post);
+
+  if (post.format === 'Carousel' && slides.length > 1) {
+    imgArea.innerHTML = '';
+    imgArea.appendChild(renderCarousel(slides));
+  } else if (post.videoUrl) {
     imgArea.innerHTML = `<video class="modal-video" controls playsinline preload="metadata" src="${post.videoUrl}"></video>`;
   } else if (post.url) {
     imgArea.innerHTML = `<img class="modal-img" src="${post.url}" alt="${post.title}" />`;
@@ -879,6 +816,117 @@ function renderModalMedia(post) {
   }
 }
 
+/* ── CAPTION DISPLAY ── */
+function renderCaptionArea(post) {
+  const area = document.getElementById('modalCaptionArea');
+  const hasCaption = post.caption && post.caption.trim();
+  const hasHashtags = post.hashtags && post.hashtags.trim();
+  if (!hasCaption && !hasHashtags) {
+    area.innerHTML = '<p class="caption-empty-hint">Aucune caption pour ce post.</p>';
+  } else {
+    area.innerHTML = '';
+    if (hasCaption) {
+      const p = document.createElement('p');
+      p.className = 'modal-caption-text';
+      p.textContent = post.caption;
+      area.appendChild(p);
+    }
+    if (hasHashtags) {
+      const h = document.createElement('p');
+      h.className = 'modal-hashtags-text';
+      h.textContent = post.hashtags;
+      area.appendChild(h);
+    }
+  }
+}
+
+/* ── CLIENT APPROVAL UI ── */
+function renderApprovalSection(post) {
+  const section = document.getElementById('clientApprovalSection');
+  const ap = getApproval(post);
+  const status = post.approval_status || 'En attente';
+  const comment = post.client_comments || '';
+
+  let html = `<div class="approval-status-display">
+    <span class="approval-admin-label">Statut :</span>
+    <span class="approval-badge ${ap.cls}">${ap.icon} ${ap.label}</span>
+  </div>`;
+
+  if (status === 'En attente') {
+    html += `<div class="approval-actions">
+      <button class="approve-btn green" onclick="clientApprove(${post.id}, 'Approuvé')">✅ Approuver ce post</button>
+      <button class="approve-btn pink" onclick="showRevisionArea(${post.id})">✏️ Demander une révision</button>
+    </div>
+    <div id="revisionArea" style="display:none" class="revision-area">
+      <textarea class="revision-textarea" id="revisionComment" placeholder="Décris les modifications souhaitées…"></textarea>
+      <button class="revision-send-btn" onclick="clientApprove(${post.id}, 'Révision demandée')">Envoyer la demande</button>
+    </div>`;
+  } else if (status === 'Révision demandée') {
+    html += `<div class="approval-actions">
+      <button class="approve-btn green" onclick="clientApprove(${post.id}, 'Approuvé')">✅ Approuver maintenant</button>
+    </div>`;
+    if (comment) {
+      html += `<div class="client-comment-display"><strong>Ton commentaire</strong>${comment}</div>`;
+    }
+    html += `<div class="revision-area" style="margin-top:10px">
+      <p style="font-size:11px;color:#bbb;margin-bottom:6px">Modifier ta demande :</p>
+      <textarea class="revision-textarea" id="revisionComment" placeholder="Décris les modifications…">${comment}</textarea>
+      <button class="revision-send-btn" onclick="clientApprove(${post.id}, 'Révision demandée')">Mettre à jour</button>
+    </div>`;
+  } else if (status === 'Approuvé') {
+    html += `<p style="font-size:12px;color:#4caf82;font-weight:600;margin-top:4px">✅ Tu as approuvé ce post.</p>
+    <button class="approve-btn pink" style="margin-top:10px" onclick="showRevisionArea(${post.id})">✏️ Changer d'avis — Demander une révision</button>
+    <div id="revisionArea" style="display:none" class="revision-area">
+      <textarea class="revision-textarea" id="revisionComment" placeholder="Décris les modifications souhaitées…"></textarea>
+      <button class="revision-send-btn" onclick="clientApprove(${post.id}, 'Révision demandée')">Envoyer la demande</button>
+    </div>`;
+  }
+
+  section.innerHTML = html;
+}
+
+function showRevisionArea(postId) {
+  const area = document.getElementById('revisionArea');
+  if (area) { area.style.display = 'block'; document.getElementById('revisionComment')?.focus(); }
+}
+
+function clientApprove(postId, approvalStatus) {
+  const comment = document.getElementById('revisionComment')?.value?.trim() || '';
+  if (approvalStatus === 'Révision demandée' && !comment) {
+    showToast('Décris les modifications souhaitées.', '#e0607a'); return;
+  }
+  const post = posts.find(p => p.id == postId);
+  if (post) {
+    post.approval_status = approvalStatus;
+    post.client_comments = comment;
+  }
+  _approveInSheets(postId, approvalStatus, comment).then(() => {
+    renderGrid();
+    if (post) renderApprovalSection(post);
+    showToast(approvalStatus === 'Approuvé' ? '✅ Post approuvé !' : '✏️ Révision demandée — merci !');
+  });
+}
+
+/* ── ADMIN APPROVAL INFO ── */
+function renderAdminApprovalInfo(post) {
+  const status = post.approval_status || 'En attente';
+  const comment = post.client_comments || '';
+  const ap = getApproval(post);
+  const badge = document.getElementById('adminApprovalBadge');
+  if (badge) { badge.textContent = ap.icon + ' ' + ap.label; badge.className = 'approval-badge ' + ap.cls; }
+  const commentBox = document.getElementById('adminCommentBox');
+  const commentTA = document.getElementById('adminClientComment');
+  if (commentBox && commentTA) {
+    if (comment) {
+      commentBox.style.display = 'block';
+      commentTA.value = comment;
+    } else {
+      commentBox.style.display = 'none';
+    }
+  }
+}
+
+/* ── NAV BUTTONS ── */
 function updateNavButtons() {
   const idx = visiblePosts.findIndex(p => p.id === currentPostId);
   document.getElementById('prevBtn').disabled = idx <= 0;
@@ -890,52 +938,64 @@ function navigatePost(dir) {
   const idx = visiblePosts.findIndex(p => p.id === currentPostId);
   const newIdx = idx + dir;
   if (newIdx < 0 || newIdx >= visiblePosts.length) return;
-  const video = document.querySelector('.modal-video');
-  if (video) video.pause();
+  document.querySelector('.modal-video')?.pause();
   openPostModal(visiblePosts[newIdx].id);
 }
 
+/* ── OPEN POST MODAL ── */
 function openPostModal(id) {
   currentPostId = id;
   const post = posts.find(p => p.id === id);
   if (!post) return;
 
   renderModalMedia(post);
+  renderCaptionArea(post);
 
   const p = PILLAR[post.pillar] || PILLAR.connexion;
-  document.getElementById('modalMeta').innerHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>`;
+  const metaHTML = `<span class="pillar-tag ${p.tag}">${p.label}</span><span class="format-tag">${post.format}</span>`;
 
-  document.getElementById('editTitle').value    = post.title || '';
-  document.getElementById('editStatus').value   = post.status || 'draft';
-  document.getElementById('editFormat').value   = post.format || 'Reel';
-  document.getElementById('editCaption').value  = post.caption || '';
-  document.getElementById('editHashtags').value = post.hashtags || '';
-  document.getElementById('editDate').value     = post.date || '';
-  document.getElementById('urlInput').value     = post.url || '';
-  document.getElementById('videoInput').value   = post.videoUrl || '';
+  if (IS_CLIENT) {
+    // Client view
+    document.getElementById('adminModalBody').style.display = 'none';
+    document.getElementById('clientModalBody').style.display = 'block';
+    document.getElementById('clientModalMeta').innerHTML = metaHTML;
+    document.getElementById('clientPostTitle').textContent = post.title || '';
+    document.getElementById('clientPostDate').textContent = post.date ? '📅 ' + post.date : '';
+    renderApprovalSection(post);
+  } else {
+    // Admin view
+    document.getElementById('adminModalBody').style.display = 'block';
+    document.getElementById('clientModalBody').style.display = 'none';
+    document.getElementById('modalMeta').innerHTML = metaHTML;
+    document.getElementById('editTitle').value   = post.title    || '';
+    document.getElementById('editStatus').value  = post.status   || 'draft';
+    document.getElementById('editFormat').value  = post.format   || 'Reel';
+    document.getElementById('editCaption').value = post.caption  || '';
+    document.getElementById('editHashtags').value= post.hashtags || '';
+    document.getElementById('editDate').value    = post.date     || '';
+    document.getElementById('urlInput').value    = post.url      || '';
+    document.getElementById('videoInput').value  = post.videoUrl || '';
+    document.getElementById('slidesInput').value = post.slides   || '';
+    document.getElementById('copyHashtagsBtn').textContent = 'Copier';
+    document.getElementById('copyHashtagsBtn').classList.remove('copied');
+    validateImageUrl(document.getElementById('urlInput').value);
+    document.getElementById('urlInput').oninput = () => validateImageUrl(document.getElementById('urlInput').value);
+    updateCaptionCounter();
+    updateNavButtons();
+    renderAdminApprovalInfo(post);
+  }
 
-  document.getElementById('copyHashtagsBtn').textContent = 'Copier';
-  document.getElementById('copyHashtagsBtn').classList.remove('copied');
-
-  // Validate and hint on URL type
-  validateImageUrl(document.getElementById('urlInput').value);
-  document.getElementById('urlInput').addEventListener('input', function() {
-    validateImageUrl(this.value);
-  }, { once: false });
-
-  updateCaptionCounter();
-  updateNavButtons();
   openModal('postModal');
-  setTimeout(() => document.getElementById('editTitle').focus(), 100);
+  if (!IS_CLIENT) setTimeout(() => document.getElementById('editTitle').focus(), 100);
 }
 
+/* ── SAVE POST (admin) ── */
 function savePost() {
   if (currentPostId === null) return;
   const post = posts.find(p => p.id === currentPostId);
   if (!post) return;
   const newTitle = document.getElementById('editTitle').value.trim();
   if (!newTitle) { document.getElementById('editTitle').focus(); showToast('Le titre ne peut pas être vide', '#e0607a'); return; }
-
   post.title    = newTitle;
   post.status   = document.getElementById('editStatus').value;
   post.format   = document.getElementById('editFormat').value;
@@ -944,16 +1004,16 @@ function savePost() {
   post.date     = document.getElementById('editDate').value.trim();
   post.url      = document.getElementById('urlInput').value.trim();
   post.videoUrl = document.getElementById('videoInput').value.trim();
-
+  post.slides   = document.getElementById('slidesInput').value.trim();
   savePosts();
   renderGrid();
   closeModal('postModal');
   showToast('✓ Enregistré');
 }
 
-/* ── ADD MODAL ── */
+/* ── ADD POST (admin) ── */
 function openAddModal() {
-  ['newTitle','newCaption','newHashtags','newDate'].forEach(id => document.getElementById(id).value = '');
+  ['newTitle','newCaption','newHashtags','newDate'].forEach(id => { document.getElementById(id).value = ''; });
   openModal('addModal');
   setTimeout(() => document.getElementById('newTitle').focus(), 100);
 }
@@ -962,99 +1022,88 @@ function addPost() {
   const title = document.getElementById('newTitle').value.trim();
   if (!title) { document.getElementById('newTitle').focus(); return; }
   const newPost = {
-    id: Date.now(), title,
-    url: '', videoUrl: '',
-    pillar: document.getElementById('newPillar').value,
-    format: document.getElementById('newFormat').value,
-    status: document.getElementById('newStatus').value,
-    date:   document.getElementById('newDate').value.trim(),
+    id: Date.now(), title, url:'', videoUrl:'', slides:'',
+    pillar:  document.getElementById('newPillar').value,
+    format:  document.getElementById('newFormat').value,
+    status:  document.getElementById('newStatus').value,
+    date:    document.getElementById('newDate').value.trim(),
     caption: document.getElementById('newCaption').value.trim(),
-    hashtags: document.getElementById('newHashtags').value.trim()
+    hashtags:document.getElementById('newHashtags').value.trim(),
+    approval_status:'En attente', client_comments:''
   };
   posts.push(newPost);
-  savePosts();
-  renderGrid();
-  closeModal('addModal');
+  savePosts(); renderGrid(); closeModal('addModal');
   showToast('✓ Post ajouté');
 }
 
-/* ── HELPERS ── */
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) {
-  const v = document.querySelector('.modal-video'); if (v) v.pause();
-  document.getElementById(id).classList.remove('open');
+/* ── CAPTION COUNTER ── */
+function updateCaptionCounter() {
+  const ta      = document.getElementById('editCaption');
+  const counter = document.getElementById('captionCounter');
+  const hint    = document.getElementById('captionHint');
+  const len     = ta.value.length;
+  counter.textContent = len;
+  if (len === 0) { counter.className = 'caption-counter'; hint.textContent = ''; hint.className = 'caption-hint'; }
+  else if (len <= CAPTION_SOFT) { counter.className = 'caption-counter ok'; hint.textContent = `✓ Visible sans "Voir plus" (${CAPTION_SOFT - len} caract. restants)`; hint.className = 'caption-hint ok'; }
+  else if (len <= CAPTION_MAX)  { counter.className = 'caption-counter warning'; hint.textContent = `⚠ Tronqué après 125 caract. · ${len} / ${CAPTION_MAX}`; hint.className = 'caption-hint warning'; }
+  else                           { counter.className = 'caption-counter over'; hint.textContent = `✕ Limite dépassée : ${len - CAPTION_MAX} caract. en trop`; hint.className = 'caption-hint over'; }
 }
+
+/* ── COPY ── */
+function copyField(fieldId, btnId) {
+  const val = document.getElementById(fieldId).value;
+  if (!val) return;
+  navigator.clipboard.writeText(val).then(() => {
+    const btn = document.getElementById(btnId);
+    btn.textContent = '✓ Copié'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copier'; btn.classList.remove('copied'); }, 2000);
+  }).catch(() => showToast('Copie non supportée', '#aaa'));
+}
+
+/* ── PRESENT MODE ── */
+function enterPresent() { document.body.classList.add('present-mode'); renderGrid(); }
+function exitPresent()  { document.body.classList.remove('present-mode'); renderGrid(); }
+
+/* ── MODAL HELPERS ── */
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.querySelector('.modal-video')?.pause(); document.getElementById(id).classList.remove('open'); }
 function handleModalClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
 
+/* ── URL VALIDATION ── */
 function validateImageUrl(url) {
   const hint = document.getElementById('urlHint');
   if (!url) { hint.style.display = 'none'; return; }
   hint.style.display = 'block';
-
-  // Direct image extensions — OK
-  if (/\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i.test(url)) {
-    hint.style.color = '#4caf82';
-    hint.textContent = '✓ Lien image direct — compatible';
-    return;
-  }
-  // Google Drive view link — OK
-  if (url.includes('drive.google.com/uc?export=view') || url.includes('drive.google.com/uc?id')) {
-    hint.style.color = '#4caf82';
-    hint.textContent = '✓ Google Drive (format correct)';
-    return;
-  }
-  // Google Drive share link — needs converting
+  if (/\.(jpg|jpeg|png|webp|gif|avif)(\?.*)?$/i.test(url)) { hint.style.color = '#4caf82'; hint.textContent = '✓ Lien image direct — compatible'; return; }
+  if (url.includes('drive.google.com/uc?export=view') || url.includes('drive.google.com/uc?id')) { hint.style.color = '#4caf82'; hint.textContent = '✓ Google Drive (format correct)'; return; }
   if (url.includes('drive.google.com') && url.includes('/file/d/')) {
     const match = url.match(/\/file\/d\/([^/]+)/);
-    if (match) {
-      const direct = 'https://drive.google.com/uc?export=view&id=' + match[1];
-      hint.style.color = '#e0607a';
-      hint.innerHTML = '⚠ Lien Drive à convertir :<br><strong style="user-select:all;font-size:10px">' + direct + '</strong><br><span style="color:#bbb">Copie ce lien et colle-le ici</span>';
-      return;
-    }
+    if (match) { const direct = 'https://drive.google.com/uc?export=view&id=' + match[1]; hint.style.color = '#e0607a'; hint.innerHTML = '⚠ Lien Drive à convertir :<br><strong style="user-select:all;font-size:10px">' + direct + '</strong>'; return; }
   }
-  // Canva design link — not a direct image
-  if (url.includes('canva.com/design')) {
-    hint.style.color = '#e0607a';
-    hint.innerHTML = "⚠ Lien Canva non compatible.<br>Dans Canva : <strong>Partager → Télécharger → PNG</strong><br>Puis héberge l'image sur Drive, puis colle le lien ici.";
-    return;
-  }
-  // Dropbox — check for raw
-  if (url.includes('dropbox.com')) {
-    if (url.includes('raw=1')) {
-      hint.style.color = '#4caf82';
-      hint.textContent = '✓ Dropbox (format correct)';
-    } else {
-      hint.style.color = '#e0607a';
-      hint.textContent = '⚠ Dropbox : remplace ?dl=0 par ?raw=1 à la fin du lien';
-    }
-    return;
-  }
-  // Unknown — neutral
-  hint.style.color = '#bbb';
-  hint.textContent = "Lien externe — s'affiche uniquement si c'est une image directe (.jpg, .png…)";
+  if (url.includes('dropbox.com')) { hint.style.color = url.includes('raw=1') ? '#4caf82' : '#e0607a'; hint.textContent = url.includes('raw=1') ? '✓ Dropbox (correct)' : '⚠ Remplace ?dl=0 par ?raw=1'; return; }
+  hint.style.color = '#bbb'; hint.textContent = "Lien externe — s'affiche si c'est une image directe (.jpg, .png…)";
 }
 
+/* ── TOAST ── */
 function showToast(msg, color) {
   const t = document.createElement('div');
   t.textContent = msg;
   t.style.cssText = `position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:${color||'#e0607a'};color:#fff;padding:8px 20px;border-radius:20px;font-size:12px;font-weight:600;z-index:9999;opacity:1;transition:opacity 0.4s;pointer-events:none;white-space:nowrap`;
   document.body.appendChild(t);
-  setTimeout(() => { t.style.opacity='0'; setTimeout(() => t.remove(), 400); }, 2000);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 2400);
 }
 
 /* ── KEYBOARD ── */
 document.addEventListener('keydown', e => {
   const postOpen = document.getElementById('postModal').classList.contains('open');
-  const inInput = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
+  const inInput  = ['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName);
   if (e.key === 'Escape') { closeModal('postModal'); closeModal('addModal'); }
-  if (e.key === 'Enter' && e.metaKey && postOpen) { e.preventDefault(); savePost(); }
-  if (e.key === 'ArrowLeft'  && postOpen && !inInput) navigatePost(-1);
-  if (e.key === 'ArrowRight' && postOpen && !inInput) navigatePost(1);
+  if (e.key === 'Enter' && e.metaKey && postOpen && !IS_CLIENT) { e.preventDefault(); savePost(); }
+  if (e.key === 'ArrowLeft'  && postOpen && !inInput && !IS_CLIENT) navigatePost(-1);
+  if (e.key === 'ArrowRight' && postOpen && !inInput && !IS_CLIENT) navigatePost(1);
 });
 
 /* ── INIT ── */
-// loadPosts() appelle renderGrid() via JSONP callback
 loadPosts();
 </script>
 </body>
