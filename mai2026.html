@@ -530,7 +530,7 @@ function jsonpFetch(url) {
 /* ── LOAD / SAVE ── */
 function loadPosts() {
   setSaveIndicator('saving', '● chargement…');
-  jsonpFetch(APPS_SCRIPT_URL + '?method=load')
+  jsonpFetch(APPS_SCRIPT_URL + '?method=load&sheet=Mai2026')
     .then(data => {
       if (data.ok && Array.isArray(data.posts) && data.posts.length > 0) {
         posts = data.posts.map(cleanPost);
@@ -572,8 +572,8 @@ function _pushToSheets() {
   const CHUNK = 3;
   const chunks = [];
   for (let i = 0; i < posts.length; i += CHUNK) chunks.push(posts.slice(i, i + CHUNK));
-  const sendClear  = () => jsonpFetch(APPS_SCRIPT_URL + '?method=clear');
-  const sendChunk  = chunk => jsonpFetch(APPS_SCRIPT_URL + '?method=append&data=' + encodeURIComponent(JSON.stringify({ posts: chunk })));
+  const sendClear  = () => jsonpFetch(APPS_SCRIPT_URL + '?method=clear&sheet=Mai2026');
+  const sendChunk  = chunk => jsonpFetch(APPS_SCRIPT_URL + '?method=append&sheet=Mai2026&data=' + encodeURIComponent(JSON.stringify({ posts: chunk })));
   sendClear()
     .then(() => chunks.reduce((p, chunk) => p.then(() => sendChunk(chunk)), Promise.resolve()))
     .then(() => {
@@ -586,7 +586,7 @@ function _pushToSheets() {
 /* ── APPROVE (Marine → Sheets directement) ── */
 function _approveInSheets(postId, approvalStatus, clientComment) {
   setSaveIndicator('saving', '● envoi…');
-  const params = '?method=approve'
+  const params = '?method=approve&sheet=Mai2026'
     + '&postId=' + encodeURIComponent(postId)
     + '&approval_status=' + encodeURIComponent(approvalStatus)
     + '&client_comments=' + encodeURIComponent(clientComment || '');
