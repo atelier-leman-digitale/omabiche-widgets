@@ -587,9 +587,9 @@ function _pushToSheets() {
 function _approveInSheets(postId, approvalStatus, clientComment) {
   setSaveIndicator('saving', '● envoi…');
   const params = '?method=approve&sheet=Mai2026'
-    + '&postId=' + encodeURIComponent(postId)
-    + '&approval_status=' + encodeURIComponent(approvalStatus)
-    + '&client_comments=' + encodeURIComponent(clientComment || '');
+    + '&id=' + encodeURIComponent(postId)
+    + '&status=' + encodeURIComponent(approvalStatus)
+    + '&comment=' + encodeURIComponent(clientComment || '');
   return jsonpFetch(APPS_SCRIPT_URL + params)
     .then(data => {
       if (data.ok) {
@@ -846,6 +846,7 @@ function renderApprovalSection(post) {
   const ap = getApproval(post);
   const status = post.approval_status || 'En attente';
   const comment = post.client_comments || '';
+  const pid = Number(post.id); // ID numérique réel du post
 
   let html = `<div class="approval-status-display">
     <span class="approval-admin-label">Statut :</span>
@@ -854,16 +855,16 @@ function renderApprovalSection(post) {
 
   if (status === 'En attente') {
     html += `<div class="approval-actions">
-      <button class="approve-btn green" onclick="clientApprove(${post.id}, 'Approuvé')">✅ Approuver ce post</button>
-      <button class="approve-btn pink" onclick="showRevisionArea(${post.id})">✏️ Demander une révision</button>
+      <button class="approve-btn green" onclick="clientApprove(${pid}, 'Approuvé')">✅ Approuver ce post</button>
+      <button class="approve-btn pink" onclick="showRevisionArea(${pid})">✏️ Demander une révision</button>
     </div>
     <div id="revisionArea" style="display:none" class="revision-area">
       <textarea class="revision-textarea" id="revisionComment" placeholder="Décris les modifications souhaitées…"></textarea>
-      <button class="revision-send-btn" onclick="clientApprove(${post.id}, 'Révision demandée')">Envoyer la demande</button>
+      <button class="revision-send-btn" onclick="clientApprove(${pid}, 'Révision demandée')">Envoyer la demande</button>
     </div>`;
   } else if (status === 'Révision demandée') {
     html += `<div class="approval-actions">
-      <button class="approve-btn green" onclick="clientApprove(${post.id}, 'Approuvé')">✅ Approuver maintenant</button>
+      <button class="approve-btn green" onclick="clientApprove(${pid}, 'Approuvé')">✅ Approuver maintenant</button>
     </div>`;
     if (comment) {
       html += `<div class="client-comment-display"><strong>Ton commentaire</strong>${comment}</div>`;
@@ -871,14 +872,14 @@ function renderApprovalSection(post) {
     html += `<div class="revision-area" style="margin-top:10px">
       <p style="font-size:11px;color:#bbb;margin-bottom:6px">Modifier ta demande :</p>
       <textarea class="revision-textarea" id="revisionComment" placeholder="Décris les modifications…">${comment}</textarea>
-      <button class="revision-send-btn" onclick="clientApprove(${post.id}, 'Révision demandée')">Mettre à jour</button>
+      <button class="revision-send-btn" onclick="clientApprove(${pid}, 'Révision demandée')">Mettre à jour</button>
     </div>`;
   } else if (status === 'Approuvé') {
     html += `<p style="font-size:12px;color:#4caf82;font-weight:600;margin-top:4px">✅ Tu as approuvé ce post.</p>
-    <button class="approve-btn pink" style="margin-top:10px" onclick="showRevisionArea(${post.id})">✏️ Changer d'avis — Demander une révision</button>
+    <button class="approve-btn pink" style="margin-top:10px" onclick="showRevisionArea(${pid})">✏️ Changer d'avis — Demander une révision</button>
     <div id="revisionArea" style="display:none" class="revision-area">
       <textarea class="revision-textarea" id="revisionComment" placeholder="Décris les modifications souhaitées…"></textarea>
-      <button class="revision-send-btn" onclick="clientApprove(${post.id}, 'Révision demandée')">Envoyer la demande</button>
+      <button class="revision-send-btn" onclick="clientApprove(${pid}, 'Révision demandée')">Envoyer la demande</button>
     </div>`;
   }
 
